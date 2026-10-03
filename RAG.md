@@ -16,7 +16,7 @@ Build a three-ESP32-C3 experimental ambient RF sensing array that:
 
 ## Current baseline
 
-After NGN-001:
+Current implementation state:
 
 - ESP32-C3 firmware foundation lives under `firmware/c3`;
 - ESP32-C3 toolchain is pinned to **ESP-IDF v5.5.5**;
@@ -25,11 +25,12 @@ After NGN-001:
 - board-specific OLED/button/BMS/GPIO values remain deliberately unassigned until verified;
 - `ngn_core` is ESP-independent production code and is compiled by native host tests;
 - GitHub Actions run native CTest and a pinned ESP32-C3 firmware build;
-- BLE baseline remains planned as NimBLE passive scanning;
+- NGN-004 implements BLE V1 as a NimBLE passive-observer adapter plus ESP-independent session-key/track logic;
 - Wi-Fi CSI baseline remains planned as fixed-channel scheduled probe traffic;
 - ESP-NOW in station mode remains the intended C3 transport/probe mechanism;
 - CSI V1 remains magnitude/amplitude-first;
-- no CSI, BLE, fusion, OLED or physical sensing behavior is implemented by NGN-001;
+- BLE track events are privacy-safe by default: raw addresses remain transient, session keys change with the injected session nonce, and rotated/private addresses are not rejoined;
+- no CSI, fusion, OLED or physical sensing behavior is implemented yet;
 - ESP8266 support is optional and outside the critical path.
 
 Do not silently upgrade ESP-IDF. A toolchain change needs its own evidence and documentation update.
@@ -150,4 +151,5 @@ After NGN-001:
 - test and acceptance rules: `docs/04-VALIDATION.md`
 - toolchain/build/CI: `docs/05-BUILDING.md`
 - BLE/privacy boundaries: `docs/06-PRIVACY-AND-SCOPE.md`
+- implemented passive BLE component: `docs/07-BLE-OBSERVATION.md`
 - upstream references: `docs/REFERENCES.md`

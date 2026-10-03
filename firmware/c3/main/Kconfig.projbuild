@@ -29,4 +29,29 @@ config NGN_BOARD_PROFILE
         button, battery or other board-specific pins. Later issues may introduce
         verified profiles behind this seam.
 
+menu "Passive BLE observation"
+
+config NGN_BLE_QUEUE_DEPTH
+    int "Normalized BLE scan-report queue depth"
+    range 4 64
+    default 16
+    help
+        Fixed queue between the NimBLE GAP callback and the BLE worker. A full
+        queue drops the newest report and increments a diagnostic counter.
+
+config NGN_BLE_WORKER_STACK_SIZE
+    int "BLE worker stack size"
+    range 2048 8192
+    default 4096
+
+config NGN_BLE_DIAGNOSTIC_RAW_ADDRESS
+    bool "Expose raw BLE addresses in transient debug logging"
+    default n
+    help
+        PRIVACY WARNING: enabling this emits current over-the-air BLE addresses
+        to the local debug console. It is disabled by default and raw addresses
+        are never present in the normal track-event sink contract.
+
+endmenu
+
 endmenu
