@@ -58,16 +58,16 @@ See [RAG.md](RAG.md) and the numbered documents under [docs/](docs/) for program
 
 The implementation is deliberately staged:
 
-1. repository/build/test foundation;
-2. deterministic node protocol and radio scheduler;
-3. CSI acquisition;
-4. passive BLE acquisition;
-5. CSI baseline and perturbation metrics;
-6. coordinator fusion;
-7. OLED rendering;
-8. capture/replay tooling;
-9. three-C3 hardware integration and acceptance;
-10. optional ESP8266 illumination extension.
+1. [NGN-001 / #1](https://github.com/techrote/c3niffernggnuage/issues/1) — repository/build/test foundation;
+2. [NGN-002 / #2](https://github.com/techrote/c3niffernggnuage/issues/2) — deterministic node protocol and radio scheduler;
+3. [NGN-003 / #3](https://github.com/techrote/c3niffernggnuage/issues/3) — CSI acquisition;
+4. [NGN-004 / #4](https://github.com/techrote/c3niffernggnuage/issues/4) — passive BLE acquisition;
+5. [NGN-005 / #5](https://github.com/techrote/c3niffernggnuage/issues/5) — CSI baseline and perturbation metrics;
+6. [NGN-006 / #6](https://github.com/techrote/c3niffernggnuage/issues/6) — coordinator fusion;
+7. [NGN-007 / #7](https://github.com/techrote/c3niffernggnuage/issues/7) — OLED rendering;
+8. [NGN-008 / #8](https://github.com/techrote/c3niffernggnuage/issues/8) — capture/replay tooling;
+9. [NGN-009 / #9](https://github.com/techrote/c3niffernggnuage/issues/9) — three-C3 hardware integration and acceptance;
+10. [NGN-010 / #10](https://github.com/techrote/c3niffernggnuage/issues/10) — optional ESP8266 illumination extension.
 
 Several middle stages are designed to proceed in parallel once their dependencies are satisfied.
 
@@ -92,4 +92,4 @@ When issue-specific instructions conflict with general documentation, the issue 
 
 ## Status
 
-Programme documentation and implementation issues are being bootstrapped. No firmware acceptance is implied by the presence of planning material.
+Programme authority is established and implementation issues #1–#10 are open. No firmware implementation or hardware acceptance exists yet; NGN-001 / #1 is the programme entry point.
