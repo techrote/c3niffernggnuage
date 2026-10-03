@@ -29,13 +29,13 @@ NGN-001 establishes:
 ```text
 firmware/c3/
   CMakeLists.txt
-  Kconfig.projbuild
   sdkconfig.defaults
   config/
     node-a.defaults
     node-b.defaults
     node-c.defaults
   main/
+    Kconfig.projbuild
   components/
     ngn_core/
 
@@ -47,7 +47,7 @@ tools/
   python/
 ```
 
-ESP-specific adapters live inside the firmware project. Reusable production logic should remain in components that can be compiled by the native host harness when practical.
+ESP-specific adapters live inside the firmware project. Project-specific Kconfig lives in the `main` component so ESP-IDF discovers it. Reusable production logic should remain in components that can be compiled by the native host harness when practical.
 
 ## Firmware build
 
