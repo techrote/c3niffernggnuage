@@ -43,3 +43,32 @@ endif()
 
 add_test(NAME ngn_node COMMAND test_ngn_node)
 add_test(NAME ngn_ble COMMAND test_ngn_ble)
+
+set(NGN_DISPLAY_DIR
+    "${CMAKE_CURRENT_LIST_DIR}/../../firmware/c3/components/ngn_display"
+)
+
+add_library(ngn_display_host STATIC
+    "${NGN_DISPLAY_DIR}/ngn_framebuffer.c"
+    "${NGN_DISPLAY_DIR}/ngn_renderer.c"
+)
+
+target_include_directories(ngn_display_host PUBLIC
+    "${NGN_DISPLAY_DIR}/include"
+)
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(ngn_display_host PRIVATE -Wall -Wextra -Werror -pedantic)
+endif()
+
+add_executable(test_ngn_display
+    test_ngn_display.c
+)
+
+target_link_libraries(test_ngn_display PRIVATE ngn_display_host)
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(test_ngn_display PRIVATE -Wall -Wextra -Werror -pedantic)
+endif()
+
+add_test(NAME ngn_display COMMAND test_ngn_display)

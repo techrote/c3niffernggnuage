@@ -26,11 +26,12 @@ Current implementation state:
 - `ngn_core` is ESP-independent production code and is compiled by native host tests;
 - GitHub Actions run native CTest and a pinned ESP32-C3 firmware build;
 - NGN-004 implements BLE V1 as a NimBLE passive-observer adapter plus ESP-independent session-key/track logic;
+- NGN-007 implements the hardware-independent monochrome framebuffer, FIELD/BLE/LINKS/DEBUG renderer and a configurable/default-disabled ESP32-C3 display-adapter seam;
 - Wi-Fi CSI baseline remains planned as fixed-channel scheduled probe traffic;
 - ESP-NOW in station mode remains the intended C3 transport/probe mechanism;
 - CSI V1 remains magnitude/amplitude-first;
 - BLE track events are privacy-safe by default: raw addresses remain transient, session keys change with the injected session nonce, and rotated/private addresses are not rejoined;
-- no CSI, fusion, OLED or physical sensing behavior is implemented yet;
+- no CSI, fusion or physical sensing behavior is implemented yet; physical OLED controller/pin confirmation remains deferred to NGN-009;
 - ESP8266 support is optional and outside the critical path.
 
 Do not silently upgrade ESP-IDF. A toolchain change needs its own evidence and documentation update.
@@ -152,4 +153,5 @@ After NGN-001:
 - toolchain/build/CI: `docs/05-BUILDING.md`
 - BLE/privacy boundaries: `docs/06-PRIVACY-AND-SCOPE.md`
 - implemented passive BLE component: `docs/07-BLE-OBSERVATION.md`
+- hardware-independent OLED presentation: `docs/08-DISPLAY.md`
 - upstream references: `docs/REFERENCES.md`
