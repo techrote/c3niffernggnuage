@@ -1,6 +1,6 @@
-# C3niffer NGGUNAGE
+# C3niffer NGGNUAGE
 
-**C3niffer NGGUNAGE** is an experimental distributed 2.4 GHz ambient-sensing array built around three ESP32-C3 nodes.
+**C3niffer NGGNUAGE** is an experimental distributed 2.4 GHz ambient-sensing array built around three ESP32-C3 nodes.
 
 The project combines:
 
@@ -11,7 +11,7 @@ The project combines:
 - serial data capture and replay for proper experiments;
 - optional ESP8266 D1 mini probe/illumination nodes after the three-C3 baseline is proven.
 
-The name **NGGUNAGE** originated as a gloriously meaningless automatic-title artefact and is intentionally retained.
+The name **NGGNUAGE** originated as a gloriously meaningless automatic-title artefact and is intentionally retained.
 
 ## Intended hardware
 
