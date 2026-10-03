@@ -16,7 +16,7 @@ Build a three-ESP32-C3 experimental ambient RF sensing array that:
 
 ## Current baseline
 
-After NGN-001:
+Current implementation state:
 
 - ESP32-C3 firmware foundation lives under `firmware/c3`;
 - ESP32-C3 toolchain is pinned to **ESP-IDF v5.5.5**;
