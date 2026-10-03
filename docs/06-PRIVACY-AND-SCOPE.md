@@ -53,6 +53,19 @@ Log:
 
 A developer diagnostic mode may expose a raw address transiently if required to debug acquisition, but it must be opt-in, obvious and not the default capture format.
 
+## NGN-004 enforcement
+
+The passive BLE component enforces these rules at its data boundary:
+
+- key derivation uses the current over-the-air address, not a resolved identity address;
+- address bytes and the unsalted payload signature exist only in transient acquisition/key-derivation structures and are absent from the normal track-event sink;
+- the session nonce is supplied by the caller, bounded to 8–32 bytes, and is neither invented nor persisted by the BLE component;
+- address rotation naturally produces a different session key and no re-identification/join path exists;
+- Central, Peripheral, Broadcaster, GATT client/server and NimBLE Security Manager support are disabled in the project defaults;
+- raw-address console output is guarded by `CONFIG_NGN_BLE_DIAGNOSTIC_RAW_ADDRESS`, which defaults off and visibly warns when enabled.
+
+See `docs/07-BLE-OBSERVATION.md` for the component contract and lifecycle details.
+
 ## Interpretation
 
 A new BLE observation plus a CSI disturbance is a **temporal RF coincidence**.
