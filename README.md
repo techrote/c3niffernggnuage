@@ -54,6 +54,20 @@ The system must distinguish **measured observations** from **inferences**. A BLE
 
 See [RAG.md](RAG.md) and the numbered documents under [docs/](docs/) for programme authority.
 
+## Foundation
+
+NGN-001 establishes:
+
+- the ESP-IDF v5.5.5 project under `firmware/c3`;
+- a safe explicit A/B/C node-role configuration seam;
+- a board-profile seam with no invented OLED/BMS/GPIO values;
+- reusable ESP-independent production logic under `firmware/c3/components`;
+- native CMake/CTest coverage under `tests/host`;
+- reserved `tools/python` and `tests/fixtures` paths for later issues;
+- GitHub Actions for native tests and an ESP32-C3 firmware build.
+
+The default node role is intentionally **unconfigured**. See [firmware/c3/README.md](firmware/c3/README.md) and [docs/05-BUILDING.md](docs/05-BUILDING.md).
+
 ## Programme shape
 
 The implementation is deliberately staged:
@@ -69,7 +83,7 @@ The implementation is deliberately staged:
 9. [NGN-009 / #9](https://github.com/techrote/c3niffernggnuage/issues/9) — three-C3 hardware integration and acceptance;
 10. [NGN-010 / #10](https://github.com/techrote/c3niffernggnuage/issues/10) — optional ESP8266 illumination extension.
 
-Several middle stages are designed to proceed in parallel once their dependencies are satisfied.
+After NGN-001, #2, #4 and #7 are designed to proceed independently.
 
 ## Experimental posture
 
@@ -92,4 +106,4 @@ When issue-specific instructions conflict with general documentation, the issue 
 
 ## Status
 
-Programme authority is established and implementation issues #1–#10 are open. No firmware implementation or hardware acceptance exists yet; NGN-001 / #1 is the programme entry point.
+The NGN-001 foundation is implemented without radio-sensing or display behavior. No physical sensing acceptance is implied; hardware acceptance remains owned by NGN-009.
