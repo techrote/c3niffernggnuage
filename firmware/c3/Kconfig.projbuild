@@ -1,0 +1,32 @@
+menu "C3niffer NGGUNAGE foundation"
+
+choice NGN_NODE_ROLE
+    prompt "Logical node role"
+    default NGN_NODE_ROLE_UNCONFIGURED
+    help
+        Select the logical A/B/C identity explicitly. The unconfigured default is
+        intentionally safe so flashing order can never assign identity implicitly.
+
+config NGN_NODE_ROLE_UNCONFIGURED
+    bool "Unconfigured"
+
+config NGN_NODE_ROLE_A
+    bool "Node A"
+
+config NGN_NODE_ROLE_B
+    bool "Node B"
+
+config NGN_NODE_ROLE_C
+    bool "Node C / coordinator"
+
+endchoice
+
+config NGN_BOARD_PROFILE
+    string "Board profile identifier"
+    default "generic-esp32c3"
+    help
+        Human-readable board profile name. NGN-001 deliberately defines no OLED,
+        button, battery or other board-specific pins. Later issues may introduce
+        verified profiles behind this seam.
+
+endmenu

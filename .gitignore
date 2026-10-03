@@ -1,0 +1,21 @@
+# ESP-IDF generated output and machine-local configuration
+firmware/c3/build/
+firmware/c3/sdkconfig
+firmware/c3/sdkconfig.old
+firmware/c3/managed_components/
+
+# Native host builds
+build/
+tests/host/build/
+
+# Python tooling
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Editors / operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

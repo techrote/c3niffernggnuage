@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  host-tests:
+    name: Host tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S tests/host -B build/host -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build/host --parallel 2
+
+      - name: Test
+        run: ctest --test-dir build/host --output-on-failure
+
+  esp32c3-build:
+    name: ESP32-C3 / ESP-IDF v5.5.5
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build ESP32-C3 firmware
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.5.5
+          target: esp32c3
+          path: firmware/c3
