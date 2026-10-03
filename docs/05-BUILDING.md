@@ -11,18 +11,47 @@ target: esp32c3
 
 Do not silently switch to a newer ESP-IDF release.
 
-Typical environment:
+Espressif's v5.5.5 release is the source authority for the pinned SDK. A typical source installation is:
 
 ```bash
-git clone -b v5.5.5 --recursive https://github.com/espressif/esp-idf.git
-cd esp-idf
+git clone -b v5.5.5 --recursive https://github.com/espressif/esp-idf.git esp-idf-v5.5.5
+cd esp-idf-v5.5.5
 ./install.sh esp32c3
 . ./export.sh
 ```
 
 Windows users may use Espressif's supported ESP-IDF environment/PowerShell flow for the same pinned release.
 
-The project structure established by NGN-001 should make the normal firmware path obvious, for example:
+## Repository layout
+
+NGN-001 establishes:
+
+```text
+firmware/c3/
+  CMakeLists.txt
+  sdkconfig.defaults
+  config/
+    node-a.defaults
+    node-b.defaults
+    node-c.defaults
+  main/
+    Kconfig.projbuild
+  components/
+    ngn_core/
+
+tests/
+  host/
+  fixtures/
+
+tools/
+  python/
+```
+
+ESP-specific adapters live inside the firmware project. Project-specific Kconfig lives in the `main` component so ESP-IDF discovers it. Reusable production logic should remain in components that can be compiled by the native host harness when practical.
+
+## Firmware build
+
+From an activated ESP-IDF v5.5.5 environment:
 
 ```bash
 cd firmware/c3
@@ -30,15 +59,60 @@ idf.py set-target esp32c3
 idf.py build
 ```
 
-Exact paths are authoritative once NGN-001 lands.
+The generated `firmware/c3/sdkconfig` is machine/build state and is ignored. Reproducible defaults live in `sdkconfig.defaults`.
 
-## Configuration
+### Logical node role
 
-Track `sdkconfig.defaults` or equivalent reproducible defaults.
+The default is intentionally **unconfigured**. A/B/C identity must be selected explicitly and never depends on flashing order.
 
-Do not commit machine-specific generated configuration unless an issue explicitly requires a fixture.
+Interactive selection:
 
-Expected feature configuration eventually includes:
+```bash
+cd firmware/c3
+idf.py menuconfig
+```
+
+Choose **C3niffer NGGUNAGE foundation → Logical node role**.
+
+For a clean reproducible role overlay:
+
+```bash
+cd firmware/c3
+rm -f sdkconfig
+idf.py set-target esp32c3
+idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;config/node-a.defaults" reconfigure
+idf.py build
+```
+
+Use `node-b.defaults` or `node-c.defaults` for the other roles.
+
+### Board profile
+
+`CONFIG_NGN_BOARD_PROFILE` defaults to `generic-esp32c3`.
+
+NGN-001 defines no OLED, button, battery/BMS, ADC or board-specific GPIO constants. Later issues must establish concrete profiles from verified evidence.
+
+## Native tests
+
+The native harness compiles the same `ngn_core` production source used by ESP-IDF without ESP-IDF headers.
+
+From the repository root:
+
+```bash
+cmake -S tests/host -B build/host -DCMAKE_BUILD_TYPE=Release
+cmake --build build/host --parallel
+ctest --test-dir build/host --output-on-failure
+```
+
+GCC/Clang builds use `-Wall -Wextra -Werror -pedantic`.
+
+As protocol, sensing, fusion and rendering logic lands, extend this harness rather than embedding pure algorithms in radio/display adapters.
+
+## Configuration ownership
+
+Track `sdkconfig.defaults` and deliberate role/profile overlays. Do not commit machine-specific generated configuration unless an issue explicitly requires a fixture.
+
+Expected feature configuration in later issues includes:
 
 - Wi-Fi station mode;
 - Wi-Fi CSI support;
@@ -47,61 +121,48 @@ Expected feature configuration eventually includes:
 - Wi-Fi/Bluetooth coexistence controls appropriate to the pinned IDF;
 - serial console/logging.
 
-NGN-001/003/004 own the actual Kconfig values and must verify them against v5.5.5 documentation rather than copying names from a different IDF release.
-
-## Native tests
-
-Pure signal/protocol/fusion/render logic should be buildable on a normal host compiler without ESP hardware.
-
-Preferred pattern:
-
-```text
-components/
-  protocol/
-  sensing/
-  fusion/
-  render/
-tests/host/
-```
-
-Hardware adapters may depend on ESP-IDF; core logic should not.
-
-Use CMake/CTest or another minimal deterministic host harness selected in NGN-001.
+NGN-002/003/004 own those actual Kconfig settings and must verify names/behavior against v5.5.5 documentation rather than copying settings from another release.
 
 ## Python tooling
 
-Host capture/replay tools live outside firmware and use a pinned dependency file.
+`tools/python/` is reserved for NGN-008 capture/replay tooling.
 
-Prefer the Python standard library where reasonable.
+NGN-001 deliberately introduces no Python runtime dependency. When Python tooling lands:
 
-Required behavior:
-
-- clear CLI help;
-- deterministic parsing;
-- no network/cloud requirement;
-- test fixtures small enough for the repository;
-- large experiment captures stored outside git or as deliberately curated compressed fixtures.
+- prefer the standard library where reasonable;
+- pin required third-party dependencies;
+- keep behavior deterministic and local/offline;
+- keep repository fixtures small;
+- store large experiment captures outside git unless deliberately curated.
 
 ## CI
 
-NGN-001 should establish GitHub Actions jobs for:
+`.github/workflows/ci.yml` runs:
 
-1. host tests;
-2. ESP32-C3 build with Espressif's pinned v5.5.5 environment.
+1. **Host tests** — configure/build `tests/host`, then run CTest.
+2. **ESP32-C3 / ESP-IDF v5.5.5** — use Espressif's official `esp-idf-ci-action` with:
+   - `esp_idf_version: v5.5.5`
+   - `target: esp32c3`
+   - `path: firmware/c3`
 
-Later issues extend CI rather than replacing it.
+No attached hardware is required for ordinary PR CI.
 
-Do not require attached hardware for ordinary PR CI.
+Later issues extend these checks rather than replacing them.
 
-## Flash/monitor
+## Flash and monitor
 
-Once firmware exists, document exact commands in the repository. Typical form:
+Once a role is configured and a board is connected:
 
 ```bash
+cd firmware/c3
 idf.py -p <PORT> flash monitor
 ```
 
-Multiple-node experiments should use explicit node-role configuration so flashing order does not determine identity.
+The NGN-001 firmware only logs build/node/profile identity. It does not initialize Wi-Fi CSI, ESP-NOW, BLE, fusion or OLED logic.
+
+## Test fixtures
+
+`tests/fixtures/` holds small deterministic fixtures as their owning issues define real formats. NGN-001 intentionally does not invent CSI/BLE fixtures before those contracts exist.
 
 ## ESP8266
 

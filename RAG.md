@@ -16,17 +16,20 @@ Build a three-ESP32-C3 experimental ambient RF sensing array that:
 
 ## Current baseline
 
-At programme bootstrap:
+After NGN-001:
 
-- repository contains planning/authority material only;
-- no firmware implementation or hardware acceptance exists;
+- ESP32-C3 firmware foundation lives under `firmware/c3`;
 - ESP32-C3 toolchain is pinned to **ESP-IDF v5.5.5**;
 - C3 target is `esp32c3`;
-- BLE baseline uses NimBLE passive scanning;
-- Wi-Fi CSI baseline uses fixed-channel scheduled probe traffic;
-- ESP-NOW in station mode is the intended C3 transport/probe mechanism;
-- CSI V1 uses magnitude/amplitude-derived information before phase-dependent work;
-- the OLED board's exact controller, resolution and pins must be verified from the actual board before driver constants are treated as authoritative;
+- logical A/B/C identity is explicit, with a safe unconfigured default;
+- board-specific OLED/button/BMS/GPIO values remain deliberately unassigned until verified;
+- `ngn_core` is ESP-independent production code and is compiled by native host tests;
+- GitHub Actions run native CTest and a pinned ESP32-C3 firmware build;
+- BLE baseline remains planned as NimBLE passive scanning;
+- Wi-Fi CSI baseline remains planned as fixed-channel scheduled probe traffic;
+- ESP-NOW in station mode remains the intended C3 transport/probe mechanism;
+- CSI V1 remains magnitude/amplitude-first;
+- no CSI, BLE, fusion, OLED or physical sensing behavior is implemented by NGN-001;
 - ESP8266 support is optional and outside the critical path.
 
 Do not silently upgrade ESP-IDF. A toolchain change needs its own evidence and documentation update.

@@ -1,0 +1,3 @@
+# Reproducible project defaults for ESP-IDF v5.5.5.
+# The target itself is selected explicitly with `idf.py set-target esp32c3`.
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
