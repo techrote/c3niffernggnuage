@@ -104,16 +104,16 @@ See `docs/06-PRIVACY-AND-SCOPE.md`.
 
 ## Programme IDs and dependencies
 
-- **NGN-001** — repository/firmware foundation and CI. No dependencies.
-- **NGN-002** — node protocol, discovery and radio scheduler. Depends on NGN-001.
-- **NGN-003** — CSI acquisition and source attribution. Depends on NGN-002.
-- **NGN-004** — passive BLE observation pipeline. Depends on NGN-001; designed to proceed in parallel with NGN-002/003 while preserving boundaries.
-- **NGN-005** — baseline/perturbation signal engine. Depends on NGN-003.
-- **NGN-006** — coordinator fusion and event model. Depends on NGN-002, NGN-004 and NGN-005.
-- **NGN-007** — OLED driver/renderer/UI using synthetic state first. Depends on NGN-001; may proceed in parallel with sensing work.
-- **NGN-008** — serial capture, replay and experiment tooling. Depends on NGN-002, NGN-003 and NGN-004.
-- **NGN-009** — three-C3 integration and physical acceptance. Depends on NGN-005, NGN-006, NGN-007 and NGN-008.
-- **NGN-010** — optional ESP8266 illumination extension. Depends on NGN-009.
+- **[NGN-001 / #1](https://github.com/techrote/c3niffernggnuage/issues/1)** — repository/firmware foundation and CI. No dependencies.
+- **[NGN-002 / #2](https://github.com/techrote/c3niffernggnuage/issues/2)** — node protocol, discovery and radio scheduler. Depends on NGN-001.
+- **[NGN-003 / #3](https://github.com/techrote/c3niffernggnuage/issues/3)** — CSI acquisition and source attribution. Depends on NGN-002.
+- **[NGN-004 / #4](https://github.com/techrote/c3niffernggnuage/issues/4)** — passive BLE observation pipeline. Depends on NGN-001; designed to proceed in parallel with NGN-002/003 while preserving boundaries.
+- **[NGN-005 / #5](https://github.com/techrote/c3niffernggnuage/issues/5)** — baseline/perturbation signal engine. Depends on NGN-003.
+- **[NGN-006 / #6](https://github.com/techrote/c3niffernggnuage/issues/6)** — coordinator fusion and event model. Depends on NGN-002, NGN-004 and NGN-005.
+- **[NGN-007 / #7](https://github.com/techrote/c3niffernggnuage/issues/7)** — OLED driver/renderer/UI using synthetic state first. Depends on NGN-001; may proceed in parallel with sensing work.
+- **[NGN-008 / #8](https://github.com/techrote/c3niffernggnuage/issues/8)** — serial capture, replay and experiment tooling. Depends on NGN-002, NGN-003 and NGN-004.
+- **[NGN-009 / #9](https://github.com/techrote/c3niffernggnuage/issues/9)** — three-C3 integration and physical acceptance. Depends on NGN-005, NGN-006, NGN-007 and NGN-008.
+- **[NGN-010 / #10](https://github.com/techrote/c3niffernggnuage/issues/10)** — optional ESP8266 illumination extension. Depends on NGN-009.
 
 ## Recommended parallel execution
 
