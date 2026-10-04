@@ -21,6 +21,8 @@ Queue overflow is a quality condition: the newest report is dropped and `queue_d
 
 The pinned ESP-IDF v5.5.5 configuration enables Bluetooth/NimBLE and the Observer role. It explicitly disables Central, Peripheral, Broadcaster, both GATT roles and the Security Manager. Scanning uses `ble_gap_disc()` with `passive = 1`; the component contains no connect, pairing or GATT-interrogation path.
 
+ESP32-C3's v5.5.5 controller configuration is already BLE-only and does not define the ESP32-only `BTDM_CTRL_MODE_*` selectors. Those selectors are therefore intentionally absent from `sdkconfig.defaults`; passive narrowing uses the target-valid NimBLE role/profile/SMP controls and the scan parameters above.
+
 `CONFIG_ESP_COEX_SW_COEXIST_ENABLE=y` is retained. ESP-IDF v5.5.5 documents ESP32-C3 as a single shared 2.4 GHz RF resource and supports Wi-Fi STA + BLE scan coexistence. Missing observations during Wi-Fi activity therefore remain expected evidence-quality information rather than an acquisition failure.
 
 ## Session key
