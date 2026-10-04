@@ -1,4 +1,4 @@
-# 07 — Tiny OLED presentation
+# 08 — Tiny OLED presentation
 
 NGN-007 implements the presentation layer without making any claim about the final OLED module fitted to the physical board.
 
