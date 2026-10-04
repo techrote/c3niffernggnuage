@@ -123,6 +123,8 @@ Expected feature configuration in later issues includes:
 
 NGN-002/003/004 own those actual Kconfig settings and must verify names/behavior against v5.5.5 documentation rather than copying settings from another release.
 
+For `esp32c3`, do not copy `CONFIG_BTDM_CTRL_MODE_*` selectors from ESP32 or multi-target examples. ESP-IDF v5.5.5 does not define those controller-mode symbols for ESP32-C3; assigning them only produces unknown-symbol warnings. The NGN-004 observer profile is narrowed with the C3-valid NimBLE role, GATT and Security Manager controls plus passive GAP discovery.
+
 ## Python tooling
 
 `tools/python/` is reserved for NGN-008 capture/replay tooling.
