@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -120,6 +121,37 @@ static int test_bounds_and_primitives(void)
     return 0;
 }
 
+static int test_extreme_symbol_coordinates(void)
+{
+    uint8_t guarded[32];
+    ngn_framebuffer_t fb;
+
+    memset(guarded, 0xa5, sizeof(guarded));
+    CHECK(ngn_fb_init(&fb, 10u, 8u, &guarded[8], 16u));
+    ngn_fb_clear(&fb, false);
+
+    for (int value = NGN_SYMBOL_DOT; value <= NGN_SYMBOL_RING; ++value) {
+        const ngn_symbol_t symbol = (ngn_symbol_t)value;
+        ngn_fb_draw_symbol(&fb, symbol, INT32_MIN, INT32_MIN, 8u, true);
+        ngn_fb_draw_symbol(&fb, symbol, INT32_MAX, INT32_MAX, 8u, true);
+        ngn_fb_draw_symbol(&fb, symbol, INT32_MIN, 4, 8u, true);
+        ngn_fb_draw_symbol(&fb, symbol, INT32_MAX, 4, 8u, true);
+        ngn_fb_draw_symbol(&fb, symbol, 4, INT32_MIN, 8u, true);
+        ngn_fb_draw_symbol(&fb, symbol, 4, INT32_MAX, 8u, true);
+    }
+
+    for (size_t i = 0u; i < 8u; ++i) {
+        CHECK(guarded[i] == 0xa5u);
+    }
+    for (size_t i = 8u; i < 24u; ++i) {
+        CHECK(guarded[i] == 0u);
+    }
+    for (size_t i = 24u; i < sizeof(guarded); ++i) {
+        CHECK(guarded[i] == 0xa5u);
+    }
+    return 0;
+}
+
 static int test_render_golden(void)
 {
     uint8_t storage[360];
@@ -210,6 +242,7 @@ static int test_tiny_dimensions(void)
 int main(void)
 {
     CHECK(test_bounds_and_primitives() == 0);
+    CHECK(test_extreme_symbol_coordinates() == 0);
     CHECK(test_render_golden() == 0);
     CHECK(test_degraded_rendering() == 0);
     CHECK(test_tiny_dimensions() == 0);
