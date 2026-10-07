@@ -335,6 +335,14 @@ void ngn_fb_draw_symbol(ngn_framebuffer_t *fb,
 {
     const int32_t radius = size == 0u ? 1 : (size > 8u ? 8 : (int32_t)size);
 
+    /* Reject wholly off-screen symbols before signed centre +/- radius arithmetic. */
+    if (!fb_valid(fb) ||
+        (int64_t)x + radius < 0 || (int64_t)y + radius < 0 ||
+        (int64_t)x - radius >= (int64_t)fb->width ||
+        (int64_t)y - radius >= (int64_t)fb->height) {
+        return;
+    }
+
     switch (symbol) {
     case NGN_SYMBOL_DOT:
         ngn_fb_fill_rect(fb, x - radius + 1, y - radius + 1,
