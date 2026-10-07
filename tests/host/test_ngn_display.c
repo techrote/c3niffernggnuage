@@ -132,6 +132,10 @@ static int test_extreme_symbol_coordinates(void)
 
     for (int value = NGN_SYMBOL_DOT; value <= NGN_SYMBOL_RING; ++value) {
         const ngn_symbol_t symbol = (ngn_symbol_t)value;
+        ngn_fb_draw_symbol(&fb, symbol, INT32_MIN, 4, 2u, true);
+        ngn_fb_draw_symbol(&fb, symbol, INT32_MAX, 4, 2u, true);
+        ngn_fb_draw_symbol(&fb, symbol, 4, INT32_MIN, 2u, true);
+        ngn_fb_draw_symbol(&fb, symbol, 4, INT32_MAX, 2u, true);
         ngn_fb_draw_symbol(&fb, symbol, INT32_MIN, INT32_MIN, 8u, true);
         ngn_fb_draw_symbol(&fb, symbol, INT32_MAX, INT32_MAX, 8u, true);
         ngn_fb_draw_symbol(&fb, symbol, INT32_MIN, 4, 8u, true);
