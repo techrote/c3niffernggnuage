@@ -87,7 +87,7 @@ Synthetic display state exists only in `tests/host/test_ngn_display.c`; it is no
 
 Native tests cover:
 
-- guarded framebuffer bounds and off-screen clipping;
+- guarded framebuffer bounds, off-screen clipping and extreme signed-coordinate symbol rejection;
 - line, triangle and symbol primitives;
 - deterministic 72x40 snapshot hashes for FIELD, BLE, LINKS and DEBUG;
 - missing/degraded node and link rendering;
