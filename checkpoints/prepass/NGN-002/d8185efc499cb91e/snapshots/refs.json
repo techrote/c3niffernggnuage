@@ -1,0 +1,142 @@
+[
+  {
+    "ref": "refs/heads/main",
+    "node_id": "REF_kwDOU6jU769yZWZzL2hlYWRzL21haW4",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/heads/main",
+    "object": {
+      "sha": "f6c7ce13aa92a9a6d387e43cfc77f0c499f43d8a",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/f6c7ce13aa92a9a6d387e43cfc77f0c499f43d8a"
+    }
+  },
+  {
+    "ref": "refs/heads/ngn-001/foundation-ci",
+    "node_id": "REF_kwDOU6jU79oAIHJlZnMvaGVhZHMvbmduLTAwMS9mb3VuZGF0aW9uLWNp",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/heads/ngn-001/foundation-ci",
+    "object": {
+      "sha": "a48c22e0d85110f01499a484ea81e452873a4ef7",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/a48c22e0d85110f01499a484ea81e452873a4ef7"
+    }
+  },
+  {
+    "ref": "refs/heads/ngn-002-protocol-scheduler",
+    "node_id": "REF_kwDOU6jU79oAJXJlZnMvaGVhZHMvbmduLTAwMi1wcm90b2NvbC1zY2hlZHVsZXI",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/heads/ngn-002-protocol-scheduler",
+    "object": {
+      "sha": "6d7a7430dc6b94d8b9810e716d8fb0caaa5c0cff",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/6d7a7430dc6b94d8b9810e716d8fb0caaa5c0cff"
+    }
+  },
+  {
+    "ref": "refs/heads/ngn-004/c3-kconfig-correction-4",
+    "node_id": "REF_kwDOU6jU79oAKnJlZnMvaGVhZHMvbmduLTAwNC9jMy1rY29uZmlnLWNvcnJlY3Rpb24tNA",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/heads/ngn-004/c3-kconfig-correction-4",
+    "object": {
+      "sha": "6c034d30857328f62d3269db6110cd263998e533",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/6c034d30857328f62d3269db6110cd263998e533"
+    }
+  },
+  {
+    "ref": "refs/heads/ngn-004/passive-ble-observation-4",
+    "node_id": "REF_kwDOU6jU79oALHJlZnMvaGVhZHMvbmduLTAwNC9wYXNzaXZlLWJsZS1vYnNlcnZhdGlvbi00",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/heads/ngn-004/passive-ble-observation-4",
+    "object": {
+      "sha": "912867eddea8050688f71bbc546d224009cf6312",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/912867eddea8050688f71bbc546d224009cf6312"
+    }
+  },
+  {
+    "ref": "refs/heads/ngn-007/display-doc-number-fix",
+    "node_id": "REF_kwDOU6jU79oAKXJlZnMvaGVhZHMvbmduLTAwNy9kaXNwbGF5LWRvYy1udW1iZXItZml4",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/heads/ngn-007/display-doc-number-fix",
+    "object": {
+      "sha": "74e87559c459383a04201e8bd3eccda0c1cee4fa",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/74e87559c459383a04201e8bd3eccda0c1cee4fa"
+    }
+  },
+  {
+    "ref": "refs/heads/ngn-007/extreme-symbol-clipping",
+    "node_id": "REF_kwDOU6jU79oAKnJlZnMvaGVhZHMvbmduLTAwNy9leHRyZW1lLXN5bWJvbC1jbGlwcGluZw",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/heads/ngn-007/extreme-symbol-clipping",
+    "object": {
+      "sha": "d94ae454bc8c82bcd72e42d4d435083a55772169",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/d94ae454bc8c82bcd72e42d4d435083a55772169"
+    }
+  },
+  {
+    "ref": "refs/heads/ngn-007/oled-renderer-ui",
+    "node_id": "REF_kwDOU6jU79oAI3JlZnMvaGVhZHMvbmduLTAwNy9vbGVkLXJlbmRlcmVyLXVp",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/heads/ngn-007/oled-renderer-ui",
+    "object": {
+      "sha": "81cd143496b52cd343398909c48091165b0aed0b",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/81cd143496b52cd343398909c48091165b0aed0b"
+    }
+  },
+  {
+    "ref": "refs/pull/11/head",
+    "node_id": "REF_kwDOU6jU77FyZWZzL3B1bGwvMTEvaGVhZA",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/pull/11/head",
+    "object": {
+      "sha": "a48c22e0d85110f01499a484ea81e452873a4ef7",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/a48c22e0d85110f01499a484ea81e452873a4ef7"
+    }
+  },
+  {
+    "ref": "refs/pull/12/head",
+    "node_id": "REF_kwDOU6jU77FyZWZzL3B1bGwvMTIvaGVhZA",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/pull/12/head",
+    "object": {
+      "sha": "912867eddea8050688f71bbc546d224009cf6312",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/912867eddea8050688f71bbc546d224009cf6312"
+    }
+  },
+  {
+    "ref": "refs/pull/13/head",
+    "node_id": "REF_kwDOU6jU77FyZWZzL3B1bGwvMTMvaGVhZA",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/pull/13/head",
+    "object": {
+      "sha": "81cd143496b52cd343398909c48091165b0aed0b",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/81cd143496b52cd343398909c48091165b0aed0b"
+    }
+  },
+  {
+    "ref": "refs/pull/14/head",
+    "node_id": "REF_kwDOU6jU77FyZWZzL3B1bGwvMTQvaGVhZA",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/pull/14/head",
+    "object": {
+      "sha": "74e87559c459383a04201e8bd3eccda0c1cee4fa",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/74e87559c459383a04201e8bd3eccda0c1cee4fa"
+    }
+  },
+  {
+    "ref": "refs/pull/15/head",
+    "node_id": "REF_kwDOU6jU77FyZWZzL3B1bGwvMTUvaGVhZA",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/pull/15/head",
+    "object": {
+      "sha": "6c034d30857328f62d3269db6110cd263998e533",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/6c034d30857328f62d3269db6110cd263998e533"
+    }
+  },
+  {
+    "ref": "refs/pull/16/head",
+    "node_id": "REF_kwDOU6jU77FyZWZzL3B1bGwvMTYvaGVhZA",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/refs/pull/16/head",
+    "object": {
+      "sha": "d94ae454bc8c82bcd72e42d4d435083a55772169",
+      "type": "commit",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/d94ae454bc8c82bcd72e42d4d435083a55772169"
+    }
+  }
+]

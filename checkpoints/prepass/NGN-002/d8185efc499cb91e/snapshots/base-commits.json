@@ -1,0 +1,72 @@
+{
+  "foundation": {
+    "sha": "6d7a7430dc6b94d8b9810e716d8fb0caaa5c0cff",
+    "node_id": "C_kwDOU6jU79oAKDZkN2E3NDMwZGM2Yjk0ZDhiOTgxMGU3MTZkOGZiMGNhYWE1YzBjZmY",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/6d7a7430dc6b94d8b9810e716d8fb0caaa5c0cff",
+    "html_url": "https://github.com/techrote/c3niffernggnuage/commit/6d7a7430dc6b94d8b9810e716d8fb0caaa5c0cff",
+    "author": {
+      "name": "tom",
+      "email": "261801702+techrote@users.noreply.github.com",
+      "date": "2026-10-03T20:13:25Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-10-03T20:13:25Z"
+    },
+    "tree": {
+      "sha": "3d343afe646f8ba1f724c0a90c267f7d26738c6e",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/trees/3d343afe646f8ba1f724c0a90c267f7d26738c6e"
+    },
+    "message": "NGN-001: establish ESP32-C3 foundation and CI (#11)\n\nCloses #1",
+    "parents": [
+      {
+        "sha": "37fe747fdec2a236e95208d58793ebbbec207c1d",
+        "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/37fe747fdec2a236e95208d58793ebbbec207c1d",
+        "html_url": "https://github.com/techrote/c3niffernggnuage/commit/37fe747fdec2a236e95208d58793ebbbec207c1d"
+      }
+    ],
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqwWHlCRC1aQ7uu5UhlAAADAgQAF9SALzAc3RCXIe0FkCr7G3s\n1qg1IwF60TdWUY8ofvzlxSMRjFvRiDzdKiUNi/tU5DgKD7m4fedWrtBx/PA0RDmh\nJ4DfJMN2x+mV/6T4rWpHvFpWXSGyH4P4LH+LP3uXOj5lwF9PQd67yOCNeLu6CxUD\nRZKQN5ia+IaFG1eXff0dC0LMfPkh7Fw0AS1GO/fum7WmXELk/oXr4h+EOqSijl7A\nxCi8WNIZs6WTimfNmWzC8m1ZrYqD3zwyWqprOcrzq3Qo2tvv0CN9c1/D7kf3mTbY\nnh1QNHic3p+VROBDS9HaYSdBq4QTixpPZeR8z4ZLUwA56cGTmFHzCPaNX7gziQBk\npENo0/yYKHd00SpafN2195mednKvQDs68mGWujulGYwnM27IsjCbvpB5QmlnFSff\nGQoa1AR0XNmO6C0I15hcqo+gXQHyFFtQpwTgW8i47jdeyZd5HSLNpmvQh3RkNHAg\na5k1wB2P/A1dSsfxsipM3JaFQvEr7WDG7bySTcesdAfQ8i/MlOdgSFtfl7Bwv6UV\nOHGmcr+MKe6Acsp3DSKu5tjDdDUj+KiR51ri803CNeOhPOrsaL55QgUY96Huj4I3\n1vqky72yDwrDSf9hCA7MLM+gjwipPgNSPQUpiGkIv4ecqWsQ4m0vsb3HtlOrvbLV\nGWxsTHGTfJUbwABsoSa9\n=/0kK\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree 3d343afe646f8ba1f724c0a90c267f7d26738c6e\nparent 37fe747fdec2a236e95208d58793ebbbec207c1d\nauthor tom <261801702+techrote@users.noreply.github.com> 1791058405 +0100\ncommitter GitHub <noreply@github.com> 1791058405 +0100\n\nNGN-001: establish ESP32-C3 foundation and CI (#11)\n\nCloses #1",
+      "verified_at": "2026-10-03T20:13:26Z"
+    }
+  },
+  "main": {
+    "sha": "f6c7ce13aa92a9a6d387e43cfc77f0c499f43d8a",
+    "node_id": "C_kwDOU6jU79oAKGY2YzdjZTEzYWE5MmE5YTZkMzg3ZTQzY2ZjNzdmMGM0OTlmNDNkOGE",
+    "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/f6c7ce13aa92a9a6d387e43cfc77f0c499f43d8a",
+    "html_url": "https://github.com/techrote/c3niffernggnuage/commit/f6c7ce13aa92a9a6d387e43cfc77f0c499f43d8a",
+    "author": {
+      "name": "tom",
+      "email": "261801702+techrote@users.noreply.github.com",
+      "date": "2026-10-07T19:11:44Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-10-07T19:11:44Z"
+    },
+    "tree": {
+      "sha": "6ffcc00c42c11b8b27e12d396dfa1eeefa2826ff",
+      "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/trees/6ffcc00c42c11b8b27e12d396dfa1eeefa2826ff"
+    },
+    "message": "NGN-007: guard extreme off-screen symbol coordinates (#16)\n\nFix signed integer overflow in public monochrome symbol clipping. Add deterministic extreme-coordinate canary tests and update validation documentation.\n\nRefs #7",
+    "parents": [
+      {
+        "sha": "5f4175cbc4e414d2ca4f4bc33de2d70a0e02bd18",
+        "url": "https://api.github.com/repos/techrote/c3niffernggnuage/git/commits/5f4175cbc4e414d2ca4f4bc33de2d70a0e02bd18",
+        "html_url": "https://github.com/techrote/c3niffernggnuage/commit/5f4175cbc4e414d2ca4f4bc33de2d70a0e02bd18"
+      }
+    ],
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqxplwCRC1aQ7uu5UhlAAAUGYQAGA/Uk6vCUJctOq5VBuE8vMT\n6vb3s7t3+v6BzGevN6iwLGM2zTj3V1W3IP5cJ7tPpZFCoDyLzbQhzIjViaj6hR1F\nlfkumasLE5L2lvLvWLdmsJN7FkZoTvUzA1BvPJunvYZV31uDgPDTez8JYn5U3v0h\nNZMEWn6LXWDbDr1qcl3rDAOAHFt6/gN7KZHy3Mvkmd9r+WMGdOhCF5iIPCsxYZCR\nG4BEj4kYABVsu7QS+ryekU+q95GscCh3CSq4VBhZIRoHGSssUVfA92sUeruhZoCf\nQk6eUINjoXD7ddI9SrxeTivW3rAml9mX7dAIRoOzDKMWjT49Hn2TnZcRLFuAStRl\nDmd3Pl05WFQF2tIAcHtm1WZ0MqsCw2YX67HzPN3YFvemnXDy8A6Mx0K/DEAVBjCV\n3XzrDkwd1OyQkAA4nNaiOVvY5IcCGhgHArRfSqhmMRKw16a+QnLMCTJtLuC0B3Or\nfslAr414fYOBfJ5/7+vtUAfQlRgjiVCWAOga4BIuedvbznsDHHtTTbCWLKkt044P\n0K84t8lrgFoLInRJLiP40XLa+ZSBYxPuCQxPMnQ30bG6aBfzVj6tWRDC42rE6GEF\nYY9Ep3U+Ik3XeohZvsVwJjSBMv/QAz0PEUroujezEztP1ReLKdqjF7EsLZqdpKH9\n2mFuHO3Kr4E7nzEItmVS\n=n32c\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree 6ffcc00c42c11b8b27e12d396dfa1eeefa2826ff\nparent 5f4175cbc4e414d2ca4f4bc33de2d70a0e02bd18\nauthor tom <261801702+techrote@users.noreply.github.com> 1791400304 +0100\ncommitter GitHub <noreply@github.com> 1791400304 +0100\n\nNGN-007: guard extreme off-screen symbol coordinates (#16)\n\nFix signed integer overflow in public monochrome symbol clipping. Add deterministic extreme-coordinate canary tests and update validation documentation.\n\nRefs #7",
+      "verified_at": "2026-10-07T19:11:44Z"
+    }
+  }
+}

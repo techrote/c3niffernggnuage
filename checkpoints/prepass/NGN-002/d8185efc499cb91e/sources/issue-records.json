@@ -1,0 +1,28 @@
+{
+  "representation": "Normalized API fields; Markdown body files retain retrieved body bytes exactly. Null comment timestamps mean not supplied by the connector, not an inferred date.",
+  "issue": {
+    "number": 2,
+    "title": "NGN-002 — Three-node protocol, session discovery and deterministic radio scheduler",
+    "state": "open",
+    "body": "# NGN-002 — Three-node protocol, session discovery and deterministic radio scheduler\n\n**Dependencies:** NGN-001 complete.  \n**Parallelism:** may proceed in parallel with NGN-004 and NGN-007. Do not absorb BLE or display scope.\n\n## Agent task prompt\n\nImplement the three-C3 control/probe protocol and deterministic sensing scheduler. Establish versioned message framing, explicit A/B/C identities, coordinator session/epoch synchronization, fixed-channel ESP-NOW transport in Wi-Fi station mode, bounded probe bursts, node health, and a host-testable scheduler/state machine. Do not implement CSI processing, BLE scanning or OLED behavior. Finish through PR, green checks and merge.\n\n\n## Authority and execution rules\n\nStart by reconciling live `main`, this issue, branches/PRs and CI. Read, in order:\n\n- `AGENTS.md`\n- `RAG.md`\n- `docs/00-PROGRAMME.md`\n- `docs/01-ARCHITECTURE.md`\n- `docs/02-PROTOCOL-AND-DATA.md`\n- `docs/03-SENSING.md`\n- `docs/04-VALIDATION.md`\n- `docs/05-BUILDING.md`\n- `docs/06-PRIVACY-AND-SCOPE.md`\n- `docs/REFERENCES.md`\n- this complete issue body and comments\n\nImplement only this issue plus strictly necessary support changes. Preserve the component boundaries and privacy/evidence constraints in the authority docs.\n\nComplete the task end-to-end: implementation, deterministic tests, relevant documentation, linked PR, automated checks, fixes, final diff review and merge. Prefer squash merge unless the repository has since established another explicit convention. Verify post-merge `main` CI when available.\n\nNever fabricate hardware evidence. If this issue has a physical-hardware gate and the required boards are unavailable, complete honest preparatory work, record the exact remaining gate, and do not mark the physical acceptance as passed.\n\n\n## Required implementation\n\n1. **Versioned message envelope**\n   - protocol version;\n   - message type;\n   - source node ID;\n   - session identifier/nonce reference;\n   - epoch ID;\n   - sequence number;\n   - explicit payload length;\n   - deterministic malformed/stale rejection.\n2. **Node identities**\n   - support logical A, B and C/coordinator roles;\n   - role configured explicitly;\n   - source-MAC mapping is observable and validated.\n3. **Session lifecycle**\n   - coordinator begins a session with fresh session nonce/ID;\n   - nodes join/synchronize without an external router;\n   - stale previous-session messages are ignored.\n4. **Epoch/scheduler**\n   - deterministic state machine for A/B/C probe slots;\n   - bounded configurable burst count/spacing;\n   - configurable BLE/coexistence opportunity placeholder only — do not start BLE scans here;\n   - tolerate a temporarily missing node;\n   - expose slot/epoch events to higher layers.\n5. **ESP-NOW adapter**\n   - Wi-Fi station mode;\n   - one configured 2.4 GHz channel;\n   - bounded send/receive queues;\n   - probe packets small and stable;\n   - avoid performing substantial work in radio callbacks.\n6. **Node health**\n   - session/epoch, probe TX/RX sequence, queue/drop/error counters and firmware/protocol version;\n   - no invented battery measurement.\n7. **Tests**\n   - protocol encode/decode;\n   - version/length rejection;\n   - stale session/epoch;\n   - sequence wrap;\n   - deterministic schedule;\n   - node timeout/rejoin behavior;\n   - transport adapter can be mocked on host.\n8. Update protocol/architecture docs to match exact landed encoding and configuration.\n\n## Explicit non-scope\n\n- CSI callback/data reduction;\n- BLE scanning or advertiser tracking;\n- field/activity algorithms;\n- OLED;\n- ESP8266.\n\n## Acceptance\n\n- **HOST:** protocol and scheduler suites pass deterministically.\n- **BUILD:** ESP32-C3 build passes under the pinned toolchain.\n- No router is required by the baseline schedule.\n- Radio callbacks remain bounded.\n- Protocol wire format and version are documented.\n",
+    "url": "https://github.com/techrote/c3niffernggnuage/issues/2",
+    "created_at": "2026-10-03T19:47:01Z",
+    "updated_at": "2026-10-04T12:47:41Z"
+  },
+  "comments": [
+    {
+      "id": 5973089524,
+      "url": "https://github.com/techrote/c3niffernggnuage/issues/2#issuecomment-5973089524",
+      "user": "techrote",
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": 5980085490,
+      "url": "https://github.com/techrote/c3niffernggnuage/issues/2#issuecomment-5980085490",
+      "user": "techrote",
+      "created_at": null,
+      "updated_at": null
+    }
+  ]
+}

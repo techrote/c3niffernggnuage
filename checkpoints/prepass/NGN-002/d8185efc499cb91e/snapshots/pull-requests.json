@@ -1,0 +1,92 @@
+[
+  {
+    "number": 16,
+    "title": "NGN-007: reject extreme off-screen symbol coordinates before arithmetic",
+    "state": "closed",
+    "merged_at": "2026-10-07T19:11:44Z",
+    "html_url": "https://github.com/techrote/c3niffernggnuage/pull/16",
+    "head": {
+      "ref": "ngn-007/extreme-symbol-clipping",
+      "sha": "d94ae454bc8c82bcd72e42d4d435083a55772169"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "5f4175cbc4e414d2ca4f4bc33de2d70a0e02bd18"
+    }
+  },
+  {
+    "number": 15,
+    "title": "NGN-004: correct ESP32-C3 BLE Kconfig defaults",
+    "state": "closed",
+    "merged_at": "2026-10-04T13:05:55Z",
+    "html_url": "https://github.com/techrote/c3niffernggnuage/pull/15",
+    "head": {
+      "ref": "ngn-004/c3-kconfig-correction-4",
+      "sha": "6c034d30857328f62d3269db6110cd263998e533"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "1f2d55c7d39cf98010db5c3090d80e4ae9feff7e"
+    }
+  },
+  {
+    "number": 14,
+    "title": "NGN-007: correct display documentation numbering",
+    "state": "closed",
+    "merged_at": "2026-10-04T12:59:33Z",
+    "html_url": "https://github.com/techrote/c3niffernggnuage/pull/14",
+    "head": {
+      "ref": "ngn-007/display-doc-number-fix",
+      "sha": "74e87559c459383a04201e8bd3eccda0c1cee4fa"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "72a1c5c2c680c23471e67270c715a7f93f6f9c92"
+    }
+  },
+  {
+    "number": 13,
+    "title": "NGN-007: add tiny OLED renderer and adapter",
+    "state": "closed",
+    "merged_at": "2026-10-03T22:54:49Z",
+    "html_url": "https://github.com/techrote/c3niffernggnuage/pull/13",
+    "head": {
+      "ref": "ngn-007/oled-renderer-ui",
+      "sha": "81cd143496b52cd343398909c48091165b0aed0b"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "358450478debc670740526dd52d6aa10fafeb505"
+    }
+  },
+  {
+    "number": 12,
+    "title": "NGN-004: passive BLE observation and session-scoped tracks",
+    "state": "closed",
+    "merged_at": "2026-10-03T22:46:28Z",
+    "html_url": "https://github.com/techrote/c3niffernggnuage/pull/12",
+    "head": {
+      "ref": "ngn-004/passive-ble-observation-4",
+      "sha": "912867eddea8050688f71bbc546d224009cf6312"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "0aec72f11bd09041e23ba37f155b909afef58434"
+    }
+  },
+  {
+    "number": 11,
+    "title": "NGN-001: establish ESP32-C3 foundation and CI",
+    "state": "closed",
+    "merged_at": "2026-10-03T20:13:25Z",
+    "html_url": "https://github.com/techrote/c3niffernggnuage/pull/11",
+    "head": {
+      "ref": "ngn-001/foundation-ci",
+      "sha": "a48c22e0d85110f01499a484ea81e452873a4ef7"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "37fe747fdec2a236e95208d58793ebbbec207c1d"
+    }
+  }
+]
