@@ -34,6 +34,8 @@ Current implementation state:
 - no CSI, fusion or physical sensing behavior is implemented yet; physical OLED controller/pin confirmation remains deferred to NGN-009;
 - ESP8266 support is optional and outside the critical path.
 
+**NGN-002 recovery status (8 October 2026): [evidence-only checkpoint](https://github.com/techrote/c3niffernggnuage/blob/9ae3c066660a1254343efdf50c6efb5650327af6/checkpoints/prepass/NGN-002/d8185efc499cb91e/CHECKPOINT.md).** The original issue progress report and inspected repository/recovery evidence are preserved, but the reported local implementation candidate and raw candidate-test results were not recovered. Protocol/scheduler implementation and acceptance remain unresolved; the historical 5/5 report is not verified candidate evidence.
+
 Do not silently upgrade ESP-IDF. A toolchain change needs its own evidence and documentation update.
 
 ## Architecture in one page
