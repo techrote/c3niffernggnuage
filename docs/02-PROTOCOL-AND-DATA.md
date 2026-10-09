@@ -213,7 +213,7 @@ The record retains:
 - raw CSI byte length and complete signed raw I/Q bytes;
 - valid-data offset (four when ESP-IDF marks the first word invalid);
 - squared-magnitude vector and complex-sample count;
-- optional current session, epoch and accepted PROBE source sequence;
+- capture-time nonzero session ID plus optional epoch and accepted PROBE source sequence;
 - absolute callback-time delta to the selected accepted PROBE;
 - quality flags for first-word exclusion and unattributed known-source CSI.
 
@@ -226,7 +226,7 @@ An accepted protocol PROBE produces a separate normal-worker `PROBE_RX` event;
 the CSI worker correlates by same logical source and nearest capture timestamp
 inside the configured bounded window.
 
-Known-source CSI without a matching accepted probe is explicitly marked
+The capture-time session is retained even for delayed/unattributed records, and only probe observations from that same session are eligible for correlation. Known-source CSI without a matching accepted probe is explicitly marked
 unattributed and is diagnostic evidence only. It must not be interpreted as a
 session/epoch/probe measurement by NGN-005. The 5 ms default correlation window
 is configurable and is not a measured hardware guarantee.
