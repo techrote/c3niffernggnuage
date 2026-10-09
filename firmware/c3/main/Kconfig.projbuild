@@ -1,4 +1,4 @@
-menu "C3niffer NGGUNAGE foundation"
+menu "C3niffer NGGUNAGE"
 
 choice NGN_NODE_ROLE
     prompt "Logical node role"
@@ -28,6 +28,67 @@ config NGN_BOARD_PROFILE
         Human-readable board profile name. NGN-001 deliberately defines no OLED,
         button, battery or other board-specific pins. Later issues may introduce
         verified profiles behind this seam.
+
+menu "Three-node radio schedule"
+
+config NGN_RADIO_CHANNEL
+    int "Fixed Wi-Fi channel (same on A/B/C)"
+    range 1 11
+    default 6
+
+config NGN_RADIO_BURST_COUNT
+    int "Probes in each A/B/C slot"
+    range 1 16
+    default 4
+
+config NGN_RADIO_PROBE_SPACING_MS
+    int "Probe spacing in milliseconds"
+    range 1 65535
+    default 10
+
+config NGN_RADIO_SYNC_SLOT_MS
+    int "Coordinator SYNC slot in milliseconds"
+    range 1 65535
+    default 40
+
+config NGN_RADIO_PROBE_SLOT_MS
+    int "Each node's probe slot in milliseconds"
+    range 1 65535
+    default 80
+
+config NGN_RADIO_COEXIST_MS
+    int "Reserved coexistence opportunity in milliseconds (no scanning)"
+    range 0 65535
+    default 80
+    help
+        An opportunity placeholder only. NGN-002 never starts BLE scanning.
+
+config NGN_RADIO_HEALTH_SLOT_MS
+    int "Each node's staggered health slot in milliseconds"
+    range 1 65535
+    default 10
+
+config NGN_RADIO_MISSING_EPOCHS
+    int "Missing-node and coordinator timeout in epochs"
+    range 1 32
+    default 4
+
+config NGN_RADIO_RX_QUEUE_DEPTH
+    int "ESP-NOW receive queue records"
+    range 1 64
+    default 16
+
+config NGN_RADIO_TX_QUEUE_DEPTH
+    int "ESP-NOW transmit queue records"
+    range 1 64
+    default 16
+
+config NGN_RADIO_STATUS_QUEUE_DEPTH
+    int "ESP-NOW completion queue records"
+    range 1 64
+    default 16
+
+endmenu
 
 menu "Passive BLE observation"
 

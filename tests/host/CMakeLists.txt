@@ -14,6 +14,9 @@ set(NGN_CORE_DIR
 add_library(ngn_core_host STATIC
     "${NGN_CORE_DIR}/ngn_node.c"
     "${NGN_CORE_DIR}/ngn_ble.c"
+    "${NGN_CORE_DIR}/ngn_protocol.c"
+    "${NGN_CORE_DIR}/ngn_schedule.c"
+    "${NGN_CORE_DIR}/ngn_radio.c"
 )
 
 target_include_directories(ngn_core_host PUBLIC
@@ -43,6 +46,16 @@ endif()
 
 add_test(NAME ngn_node COMMAND test_ngn_node)
 add_test(NAME ngn_ble COMMAND test_ngn_ble)
+
+foreach(NGN_SUITE protocol schedule radio radio_adversarial)
+    add_executable(test_ngn_${NGN_SUITE} test_ngn_${NGN_SUITE}.c)
+    target_link_libraries(test_ngn_${NGN_SUITE} PRIVATE ngn_core_host)
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(test_ngn_${NGN_SUITE} PRIVATE
+            -Wall -Wextra -Werror -pedantic)
+    endif()
+    add_test(NAME ngn_${NGN_SUITE} COMMAND test_ngn_${NGN_SUITE})
+endforeach()
 
 set(NGN_DISPLAY_DIR
     "${CMAKE_CURRENT_LIST_DIR}/../../firmware/c3/components/ngn_display"

@@ -38,7 +38,7 @@ int main(void)
     CHECK(!ngn_node_id_from_u8(3, &parsed));
     CHECK(!ngn_node_id_from_u8(0, NULL));
 
-    CHECK(NGN_PROTOCOL_VERSION == 0u);
+    CHECK(NGN_PROTOCOL_VERSION == 1u);
     CHECK(strlen(NGN_FIRMWARE_VERSION) > 0u);
 
     puts("ngn_node: ok");

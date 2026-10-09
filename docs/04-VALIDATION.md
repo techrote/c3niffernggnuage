@@ -14,7 +14,7 @@ Do not substitute one class for another without saying so.
 
 ## CI baseline
 
-Once NGN-001 lands, required automated checks should include:
+The repository's `.github/workflows/ci.yml` runs native CTest and the pinned ESP32-C3 build on pull requests and pushes to `main`. Required automated coverage includes:
 
 - native C/C++ logic tests;
 - ESP32-C3 firmware build under pinned ESP-IDF v5.5.5;
@@ -22,6 +22,38 @@ Once NGN-001 lands, required automated checks should include:
 - deterministic protocol/schema tests.
 
 ESP8266 CI is added only by NGN-010.
+
+## NGN-002 acceptance
+
+NGN-002 requires both **HOST** and **BUILD** evidence against the reviewed implementation. The former unpublished candidate's reported 5/5 result is historical context and is not acceptance evidence for reconstructed code.
+
+The complete native CTest suite has seven entries:
+
+| CTest entry | Responsibility |
+| --- | --- |
+| `ngn_node` | Explicit A/B/C identity and firmware/protocol version contract |
+| `ngn_ble` | Existing NGN-004 observation keys, privacy boundaries and track lifecycle regression coverage |
+| `ngn_protocol` | v1 wire-format goldens, CRC, lengths, malformed payloads and serial-wrap rules |
+| `ngn_schedule` | Exact default chronology, configuration bounds, deterministic plans and exclusive deadlines |
+| `ngn_radio` | Runtime/session/scheduler integration and mock transport behavior |
+| `ngn_radio_adversarial` | Stale/invalid input, identity and sequence non-poisoning, timeout/rejoin, delayed/obsolete TX and a deterministic three-node mock bus |
+| `ngn_display` | Existing NGN-007 framebuffer, clipping and synthetic renderer regression coverage |
+
+Run the complete suite, including the existing BLE/display tests, rather than selecting only the newly added targets:
+
+```bash
+cmake -S tests/host -B build/host -DCMAKE_BUILD_TYPE=Release
+cmake --build build/host --parallel
+ctest --test-dir build/host --output-on-failure
+```
+
+GCC/Clang use C11 with `-Wall -Wextra -Werror -pedantic`. Record the actual tested commit/tree and result. The table defines suite coverage; it is not a claim that a particular CI run has passed.
+
+**BUILD** requires a complete firmware build for `esp32c3` under **ESP-IDF v5.5.5**, including the ESP-NOW adapter and application integration. A native compile, an adapter syntax check or an SDK version other than the pin does not satisfy that gate. Follow `docs/05-BUILDING.md` and record the actual build/CI result. The safe unconfigured runtime default still compiles the implementation; it does not represent an on-board radio test.
+
+Before merge, inspect the complete diff for NGN-004/007 regressions, stale protocol/configuration documentation, generated artifacts and accidental CSI/BLE/fusion/OLED scope. Verify bounded callbacks and queue behavior from code as well as the host-mock tests: the mocked transport does not execute the real Wi-Fi task. The baseline must require no external router, and the documented byte format must match the encoder/decoder. Merge only after the actual required checks succeed; verify the resulting `main` CI and close #2 through that PR.
+
+NGN-002 has no physical sensing gate. Its nominal 390 ms epoch and host mock-bus timings are configuration/HOST evidence, not measured RF airtime, delivery rate, coexistence performance or sensing quality. Those measurements remain NGN-009 and the owning later issues.
 
 ## Native tests
 
@@ -31,12 +63,16 @@ Required categories as features land:
 
 ### Protocol/scheduler
 
-- encode/decode round trip;
-- malformed length/version rejection;
-- sequence wrap behavior;
-- stale session/epoch rejection;
-- deterministic slot schedule;
-- timeout/degraded-node behavior.
+- independent complete-frame goldens for SYNC, PROBE and NODE_HEALTH, known CRC vector and encode/decode agreement;
+- exact typed payload lengths, reserved bytes/flags, incompatible source/version/type and corrupt CRC rejection, with no output mutation on failure;
+- wrap-aware sequence/epoch freshness, including duplicates and ambiguous half-range differences;
+- current-session/active-epoch receive checks, immutable session configuration, nonzero coordinator session and pinned source-MAC collision handling;
+- exact 390 ms default plan, bounded bursts, arithmetic/configuration limits and exclusive transmission deadlines;
+- silent follower `WAIT_SYNC`, longer discovery/presence timeouts, same-MAC reboot/rejoin and retired-session rejection;
+- bounded RX/status processing, expiry instead of catch-up bursts, refreshed queued SYNC timing and cancellation of obsolete queued sessions;
+- deterministic three-node mock-bus operation with health/probe observations and explicit missing-node behavior.
+
+Keep transmit-submission deadlines separate from RF airtime claims. Test presence separately from a cached health snapshot, and queued probe sequence separately from driver completion. Session cancellation is a local diagnostic, not a new wire-health field or a late-drop count.
 
 ### CSI parsing/reduction
 

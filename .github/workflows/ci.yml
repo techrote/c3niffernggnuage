@@ -40,3 +40,18 @@ jobs:
           esp_idf_version: v5.5.5
           target: esp32c3
           path: firmware/c3
+
+  esp32c3-node-c-build:
+    name: ESP32-C3 node C / ESP-IDF v5.5.5
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build coordinator with radio startup linked
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.5.5
+          target: esp32c3
+          path: firmware/c3
+          command: idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;config/node-c.defaults" build
