@@ -57,6 +57,7 @@ typedef struct {
 
 typedef struct {
     ngn_node_id_t source;
+    uint64_t session_id;
     uint8_t source_mac[NGN_TRANSPORT_MAC_SIZE];
     uint8_t destination_mac[NGN_TRANSPORT_MAC_SIZE];
     ngn_csi_rx_meta_t meta;
@@ -116,6 +117,7 @@ bool ngn_csi_source_for_mac(
 /* Bounded capture helper used by the ESP callback. It performs only validation,
  * a fixed-size copy and one caller-supplied nonblocking enqueue operation. */
 bool ngn_csi_capture(ngn_node_id_t source,
+                     uint64_t session_id,
                      const uint8_t source_mac[NGN_TRANSPORT_MAC_SIZE],
                      const uint8_t destination_mac[NGN_TRANSPORT_MAC_SIZE],
                      const ngn_csi_rx_meta_t *meta,
