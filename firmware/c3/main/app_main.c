@@ -76,7 +76,8 @@ static void radio_event(void *context, const ngn_radio_event_t *event)
     }
 
     if (event->kind != NGN_RADIO_EVENT_EPOCH &&
-        event->kind != NGN_RADIO_EVENT_SCHEDULE) {
+        event->kind != NGN_RADIO_EVENT_SCHEDULE &&
+        event->kind != NGN_RADIO_EVENT_PROBE_RX) {
         diagnostic_due = true;
     }
 }
