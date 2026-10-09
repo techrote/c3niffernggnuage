@@ -171,7 +171,7 @@ ngn_csi_decode_result_t ngn_csi_decode(
         expected_channel > 11u || attribution_window_ms == 0u ||
         history_count > NGN_CSI_PROBE_HISTORY ||
         (history_count != 0u && history == NULL) ||
-        !ngn_node_id_is_valid(raw->source) || !mac_valid(raw->source_mac)) {
+        raw->session_id == 0u || !ngn_node_id_is_valid(raw->source) || !mac_valid(raw->source_mac)) {
         return NGN_CSI_DECODE_INVALID_ARGUMENT;
     }
     if (raw->meta.rx_state != 0u) {
