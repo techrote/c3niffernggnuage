@@ -1,6 +1,6 @@
 # 01 — Architecture
 
-NGN-002 implements node/session control, scheduled probes and node health. NGN-004 supplies the independent passive BLE observer, and NGN-007 supplies the independent display renderer/adapter. Their end-to-end sensing pipeline is still a programme target: NGN-002 starts neither BLE scanning nor OLED presentation and contains no CSI acquisition or fusion.
+NGN-002 implements node/session control, scheduled probes and node health. NGN-003 adds bounded ESP32-C3 CSI acquisition, known-source admission, worker-side I/Q decoding and accepted-probe attribution. NGN-004 supplies the independent passive BLE observer, and NGN-007 supplies the independent display renderer/adapter. Their end-to-end sensing pipeline is still a programme target: no baseline/activity scoring, BLE/CSI fusion or live OLED presentation is started by NGN-003.
 
 ## Nodes
 
@@ -24,11 +24,13 @@ The implemented adapter uses broadcast ESP-NOW with Wi-Fi in station mode, disab
 
 ## Implemented runtime and worker boundaries
 
-| Component | NGN-002 responsibility |
+| Component | Implemented responsibility |
 | --- | --- |
 | `ngn_core/ngn_protocol.c` | Explicit protocol-v1 bytes, typed payload validation and CRC |
 | `ngn_core/ngn_schedule.c` | Validated configuration and a deterministic, fixed-capacity epoch plan |
-| `ngn_core/ngn_radio.c` | Session/epoch state, source-MAC bindings, presence, scheduling and node-health snapshots through a mockable transport |
+| `ngn_core/ngn_radio.c` | Session/epoch state, source-MAC bindings, presence, scheduling and node-health snapshots through a mockable transport; accepted probes also emit bounded `PROBE_RX` acquisition events |
+| `ngn_core/ngn_csi.c` | ESP-independent source admission, bounded CSI record capture, I/Q decoding, squared magnitude and accepted-probe correlation |
+| `ngn_csi_esp` | Pinned ESP-IDF CSI configuration, known-source callback capture and lower-priority decode/output queues |
 | `ngn_radio_esp` | Sole ESP-NOW/Wi-Fi owner, bounded queues and driver submission/completion |
 | `main/app_main.c` | Explicit role/configuration selection, coordinator nonce generation, runtime service and separate diagnostic output |
 
@@ -83,19 +85,17 @@ Every v1 probe is 30 bytes including its envelope and CRC. Its payload contains 
 
 ## CSI acquisition pipeline
 
-This pipeline remains NGN-003/005 work. NGN-002 does not register a CSI callback or emit CSI measurements.
+NGN-003 implements the CSI capture boundary described in `docs/09-CSI-ACQUISITION.md`.
 
-The Wi-Fi/CSI callback is a capture boundary, not a signal-processing workspace.
+The existing NGN-002 Wi-Fi owner starts station mode, the fixed channel and ESP-NOW without an access point. The CSI adapter then enables the pinned ESP-IDF v5.5.5 CSI feature and promiscuous receive on that already-running interface. It creates no IP interface and performs no association.
 
-Callback responsibilities should be bounded:
+The Wi-Fi-task CSI callback rejects a source that is not in the protocol runtime's current A/B/C station-MAC map before copying CSI. For a known source it copies fixed metadata and at most 612 CSI bytes into a zero-wait queue and returns. Protocol parsing, session changes, I/Q decoding, correlation, logging and signal processing never run in that callback.
 
-1. validate pointers/lengths;
-2. record source and receive metadata;
-3. copy or reference the bounded CSI payload safely;
-4. enqueue for worker processing;
-5. return.
+The radio runtime publishes accepted `PROBE_RX` observations after its normal CRC/session/epoch/sequence/MAC checks. A lower-priority CSI worker correlates a captured record with the nearest accepted probe from the same logical source inside the configured bounded window. A known-source record with no match is retained only as explicitly unattributed diagnostic evidence.
 
-Worker responsibilities include I/Q decoding, magnitude derivation, quality filtering, baseline/perturbation processing and record emission.
+Worker decoding preserves raw signed bytes, excludes the first four bytes when ESP-IDF marks `first_word_invalid`, interprets each complex value as `[imaginary, real]` and derives a squared-magnitude vector. It retains the RF metadata and attribution delta required by later processing.
+
+NGN-003 does not implement baseline normalization, perturbation/activity scoring or inter-node CSI summaries. Those remain NGN-005/006/008 work. Physical confirmation of actual board CSI shapes, link coverage and callback timing is not a BUILD result and is separated into NGN-0031/NGN-009.
 
 ## BLE acquisition pipeline
 
