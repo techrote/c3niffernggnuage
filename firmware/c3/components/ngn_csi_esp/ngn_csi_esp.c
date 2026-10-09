@@ -104,8 +104,9 @@ static void csi_callback(void *context, wifi_csi_info_t *info)
     meta.received_ms = monotonic_ms();
     meta.first_word_invalid = info->first_word_invalid;
 
-    (void)ngn_csi_capture(source, info->mac, &meta, info->buf, info->len,
-                          raw_enqueue, s_ctx.raw_queue, &delta);
+    (void)ngn_csi_capture(source, info->mac, info->dmac, &meta,
+                          info->buf, info->len, raw_enqueue,
+                          s_ctx.raw_queue, &delta);
     add_capture_stats(&delta);
 }
 
@@ -133,6 +134,17 @@ static void worker(void *argument)
 
         result = ngn_csi_decode(&raw, channel, history,
                                 NGN_CSI_PROBE_HISTORY, window_ms, &packet);
+        if (result == NGN_CSI_DECODE_OK && !packet.probe_attributed) {
+            /* The ESP-NOW receive path and CSI callback are independent Wi-Fi
+             * notifications. Give the higher-priority radio runtime one tick
+             * to publish the accepted PROBE observation, then retry once. */
+            vTaskDelay(1u);
+            portENTER_CRITICAL(&s_lock);
+            memcpy(history, s_ctx.history[(size_t)raw.source], sizeof(history));
+            portEXIT_CRITICAL(&s_lock);
+            result = ngn_csi_decode(&raw, channel, history,
+                                    NGN_CSI_PROBE_HISTORY, window_ms, &packet);
+        }
 
         portENTER_CRITICAL(&s_lock);
         ++s_ctx.stats.processed;
