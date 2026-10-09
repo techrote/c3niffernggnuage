@@ -12,6 +12,9 @@
         }                                                                       \
     } while (0)
 
+static const uint8_t BROADCAST[NGN_TRANSPORT_MAC_SIZE] =
+    {0xffu, 0xffu, 0xffu, 0xffu, 0xffu, 0xffu};
+
 static const uint8_t MACS[3][NGN_TRANSPORT_MAC_SIZE] = {
     {0x02u, 0x11u, 0x22u, 0x33u, 0x44u, 0x01u},
     {0x02u, 0x11u, 0x22u, 0x33u, 0x44u, 0x02u},
@@ -96,7 +99,7 @@ static bool test_bounded_capture_and_queue_drop(void)
     const int8_t data[4] = {3, 4, -4, 3};
     int8_t oversize[NGN_CSI_MAX_RAW_BYTES + 1u] = {0};
 
-    CHECK(ngn_csi_capture(NGN_NODE_A, MACS[0], &meta, data, sizeof(data),
+    CHECK(ngn_csi_capture(NGN_NODE_A, MACS[0], BROADCAST, &meta, data, sizeof(data),
                           mock_enqueue, &mock, &stats));
     CHECK(mock.called);
     CHECK(stats.captured == 1u);
@@ -108,21 +111,22 @@ static bool test_bounded_capture_and_queue_drop(void)
     CHECK(mock.record.meta.rssi == -47);
     CHECK(mock.record.meta.rx_sequence == 123u);
     CHECK(memcmp(mock.record.source_mac, MACS[0], sizeof(MACS[0])) == 0);
+    CHECK(memcmp(mock.record.destination_mac, BROADCAST, sizeof(BROADCAST)) == 0);
     CHECK(memcmp(mock.record.bytes, data, sizeof(data)) == 0);
 
     mock.accept = false;
     mock.called = false;
-    CHECK(!ngn_csi_capture(NGN_NODE_A, MACS[0], &meta, data, sizeof(data),
+    CHECK(!ngn_csi_capture(NGN_NODE_A, MACS[0], BROADCAST, &meta, data, sizeof(data),
                            mock_enqueue, &mock, &stats));
     CHECK(mock.called);
     CHECK(stats.queue_drops == 1u);
 
-    CHECK(!ngn_csi_capture(NGN_NODE_A, MACS[0], &meta, oversize,
+    CHECK(!ngn_csi_capture(NGN_NODE_A, MACS[0], BROADCAST, &meta, oversize,
                            sizeof(oversize), mock_enqueue, &mock, &stats));
     CHECK(stats.oversize == 1u);
-    CHECK(!ngn_csi_capture(NGN_NODE_UNCONFIGURED, MACS[0], &meta, data,
+    CHECK(!ngn_csi_capture(NGN_NODE_UNCONFIGURED, MACS[0], BROADCAST, &meta, data,
                            sizeof(data), mock_enqueue, &mock, &stats));
-    CHECK(!ngn_csi_capture(NGN_NODE_A, MACS[0], &meta, NULL,
+    CHECK(!ngn_csi_capture(NGN_NODE_A, MACS[0], BROADCAST, &meta, NULL,
                            sizeof(data), mock_enqueue, &mock, &stats));
     CHECK(stats.invalid_input == 2u);
     return true;
@@ -136,6 +140,7 @@ static bool test_iq_decode_metadata_and_first_word(void)
 
     raw.source = NGN_NODE_B;
     memcpy(raw.source_mac, MACS[1], sizeof(raw.source_mac));
+    memcpy(raw.destination_mac, BROADCAST, sizeof(raw.destination_mac));
     raw.meta = metadata(2000u);
     raw.meta.first_word_invalid = true;
     raw.length = sizeof(data);
@@ -156,6 +161,7 @@ static bool test_iq_decode_metadata_and_first_word(void)
     CHECK((packet.quality_flags & NGN_CSI_QUALITY_FIRST_WORD_SKIPPED) != 0u);
     CHECK((packet.quality_flags & NGN_CSI_QUALITY_UNATTRIBUTED) != 0u);
     CHECK(!packet.probe_attributed);
+    CHECK(memcmp(packet.destination_mac, BROADCAST, sizeof(BROADCAST)) == 0);
     CHECK(memcmp(packet.raw_iq, data, sizeof(data)) == 0);
     return true;
 }
@@ -169,6 +175,7 @@ static bool test_probe_attribution_uses_nearest_observation(void)
 
     raw.source = NGN_NODE_A;
     memcpy(raw.source_mac, MACS[0], sizeof(raw.source_mac));
+    memcpy(raw.destination_mac, BROADCAST, sizeof(raw.destination_mac));
     raw.meta = metadata(1109u);
     raw.length = sizeof(data);
     memcpy(raw.bytes, data, sizeof(data));
@@ -215,6 +222,7 @@ static bool test_malformed_and_metadata_rejection(void)
 
     raw.source = NGN_NODE_C;
     memcpy(raw.source_mac, MACS[2], sizeof(raw.source_mac));
+    memcpy(raw.destination_mac, BROADCAST, sizeof(raw.destination_mac));
     raw.meta = metadata(200u);
     raw.length = sizeof(data);
     memcpy(raw.bytes, data, sizeof(data));
@@ -243,6 +251,10 @@ static bool test_malformed_and_metadata_rejection(void)
           NGN_CSI_DECODE_INVALID_ARGUMENT);
     CHECK(ngn_csi_decode(&raw, 6u, NULL, 0u, 0u, &packet) ==
           NGN_CSI_DECODE_INVALID_ARGUMENT);
+    CHECK(ngn_csi_decode(&raw, 6u, NULL, 1u, 5u, &packet) ==
+          NGN_CSI_DECODE_INVALID_ARGUMENT);
+    CHECK(ngn_csi_decode(&raw, 6u, NULL, NGN_CSI_PROBE_HISTORY + 1u,
+                         5u, &packet) == NGN_CSI_DECODE_INVALID_ARGUMENT);
     return true;
 }
 
