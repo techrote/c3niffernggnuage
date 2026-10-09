@@ -37,9 +37,10 @@ The complete native CTest suite has seven entries:
 | `ngn_schedule` | Exact default chronology, configuration bounds, deterministic plans and exclusive deadlines |
 | `ngn_radio` | Runtime/session/scheduler integration and mock transport behavior |
 | `ngn_radio_adversarial` | Stale/invalid input, identity and sequence non-poisoning, timeout/rejoin, delayed/obsolete TX and a deterministic three-node mock bus |
+| `ngn_csi` | Source/MAC admission, bounded capture/drop accounting, known I/Q vectors, first-word handling, metadata, malformed input and accepted-probe attribution |
 | `ngn_display` | Existing NGN-007 framebuffer, clipping and synthetic renderer regression coverage |
 
-Run the complete suite, including the existing BLE/display tests, rather than selecting only the newly added targets:
+Run the complete suite, including the existing BLE/display and CSI tests, rather than selecting only the newly added targets:
 
 ```bash
 cmake -S tests/host -B build/host -DCMAKE_BUILD_TYPE=Release
@@ -74,15 +75,29 @@ Required categories as features land:
 
 Keep transmit-submission deadlines separate from RF airtime claims. Test presence separately from a cached health snapshot, and queued probe sequence separately from driver completion. Session cancellation is a local diagnostic, not a new wire-health field or a late-drop count.
 
-### CSI parsing/reduction
+### CSI acquisition — NGN-003
 
-- known I/Q vectors -> expected magnitude;
-- malformed/odd lengths rejected;
-- source attribution;
-- baseline initialization;
+- known signed `[imaginary, real]` vectors -> exact squared magnitude;
+- malformed/odd lengths and unusable first-word records rejected;
+- first-word-invalid bytes preserved raw but excluded from the normalized vector;
+- source-MAC mapping, collision rejection and unknown-source filtering;
+- bounded callback-record queue-full/drop accounting;
+- receive metadata and destination-MAC propagation;
+- nearest accepted-probe source/session/epoch/sequence attribution;
+- explicit known-source unattributed records and correlation-window boundaries;
+- decoder failure leaves the output record unchanged.
+
+HOST evidence cannot establish physical CSI availability, callback timing or a
+correct real-board attribution window. NGN-0031 owns that focused hardware
+sanity check.
+
+### CSI signal processing — NGN-005 and later
+
+- baseline initialization/state transitions;
 - zero/noise stability;
 - synthetic perturbation raises expected metrics;
-- missing/outlier sample handling.
+- missing/outlier sample handling;
+- normalization/gain behavior and replayable thresholds.
 
 ### BLE
 
