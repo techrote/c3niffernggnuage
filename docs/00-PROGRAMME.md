@@ -41,6 +41,8 @@ NGN-002, NGN-003, NGN-004 and NGN-005.
 
 Result: deterministic probe scheduling, attributed CSI and passive BLE observations with host-tested reduction logic.
 
+**NGN-003 acquisition boundary:** fixed-channel known-source CSI is captured through a bounded ESP-IDF callback, decoded as host-testable signed I/Q evidence, and correlated to already accepted probes without changing protocol-v1. Hardware CSI availability/timing remains a separate NGN-0031 sanity gate; baseline and perturbation processing remain NGN-005.
+
 **NGN-002 preservation:** the [8 October evidence-only recovery record](https://github.com/techrote/c3niffernggnuage/blob/9ae3c066660a1254343efdf50c6efb5650327af6/checkpoints/prepass/NGN-002/d8185efc499cb91e/CHECKPOINT.md) retains the historical progress report and inspected state. The original local candidate was not recovered. This archive supplies no implementation or acceptance evidence. The subsequent NGN-002 implementation reconstructs the protocol/session/scheduler contract on current main, preserves NGN-004/007, and obtains new HOST/BUILD evidence in its linked implementation PR. CSI acquisition and physical timing/sensing acceptance remain later work.
 
 ### M2 — Productized experiment
