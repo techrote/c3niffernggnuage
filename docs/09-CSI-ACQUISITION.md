@@ -121,7 +121,7 @@ An attributed record carries:
 - source/probe sequence;
 - absolute callback-time delta to the selected accepted probe.
 
-A known-source CSI record with no accepted probe inside the window is still a
+The active session ID is stamped into the raw callback record before queueing, so a delayed raw record cannot be reinterpreted as belonging to a later session. A known-source CSI record with no accepted probe inside the window is still a
 valid **diagnostic** record, but it is marked
 `NGN_CSI_QUALITY_UNATTRIBUTED`. It must not silently enter the primary
 NGN-005 sensing stream as attributed evidence. The 5 ms default is a software
@@ -160,6 +160,7 @@ different from the configured NGN fixed channel.
 The in-memory `ngn_csi_packet_t` contract retains:
 
 - logical source node;
+- capture-time nonzero session ID;
 - source and destination MACs;
 - callback monotonic milliseconds;
 - ESP32-C3 RX metadata: RSSI, noise floor, rate, signal mode, MCS, channel
@@ -169,7 +170,7 @@ The in-memory `ngn_csi_packet_t` contract retains:
 - raw CSI byte count and valid-data offset;
 - raw signed I/Q bytes;
 - squared-magnitude vector and sample count;
-- optional session/epoch/probe sequence attribution and observed delta;
+- capture session plus optional epoch/probe-sequence attribution and observed delta;
 - quality flags.
 
 This is a local production interface for NGN-005 and NGN-008. It is **not** a
