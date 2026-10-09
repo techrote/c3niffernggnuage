@@ -59,14 +59,16 @@ static void csi_callback(void *context, wifi_csi_info_t *info)
     ngn_csi_rx_meta_t meta = {0};
     ngn_node_id_t source = NGN_NODE_UNCONFIGURED;
     bool active;
+    uint64_t session_id;
     (void)context;
 
     portENTER_CRITICAL(&s_lock);
     active = s_ctx.active;
+    session_id = s_ctx.session_id;
     memcpy(bindings, s_ctx.bindings, sizeof(bindings));
     portEXIT_CRITICAL(&s_lock);
 
-    if (!active) {
+    if (!active || session_id == 0u) {
         return;
     }
     if (info == NULL) {
@@ -104,7 +106,7 @@ static void csi_callback(void *context, wifi_csi_info_t *info)
     meta.received_ms = monotonic_ms();
     meta.first_word_invalid = info->first_word_invalid;
 
-    (void)ngn_csi_capture(source, info->mac, info->dmac, &meta,
+    (void)ngn_csi_capture(source, session_id, info->mac, info->dmac, &meta,
                           info->buf, info->len, raw_enqueue,
                           s_ctx.raw_queue, &delta);
     add_capture_stats(&delta);
