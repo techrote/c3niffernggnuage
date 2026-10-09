@@ -331,7 +331,9 @@ bool ngn_csi_esp_set_session(uint64_t session_id)
     }
     if (s_ctx.session_id != session_id) {
         s_ctx.session_id = session_id;
-        /* ngn_radio resets remote bindings at a session boundary. Drop the\n         * CSI admission map as well; subsequent BOUND events repopulate it. */\n        memset(s_ctx.bindings, 0, sizeof(s_ctx.bindings));
+        /* ngn_radio resets remote bindings at a session boundary. Drop the
+         * CSI admission map as well; subsequent BOUND events repopulate it. */
+        memset(s_ctx.bindings, 0, sizeof(s_ctx.bindings));
         memset(s_ctx.history, 0, sizeof(s_ctx.history));
         memset(s_ctx.history_next, 0, sizeof(s_ctx.history_next));
     }
