@@ -61,3 +61,28 @@ The repository's protocol v1 is the NGN application format inside ESP-NOW data;
 it is separate from Espressif's ESP-NOW v1/v2 frame version. Successful MAC-layer
 send completion is not proof of remote application delivery. NGN-002 uses no
 application acknowledgment or retransmission loop, and claims no measured RF timing.
+
+
+## NGN-003 pinned CSI implementation references
+
+Checked against the exact **ESP-IDF v5.5.5** tag:
+
+- ESP32-C3 native Wi-Fi/CSI types, including `wifi_csi_info_t`,
+  `wifi_pkt_rx_ctrl_t` and the non-HE `wifi_csi_config_t` fields:
+  https://github.com/espressif/esp-idf/blob/v5.5.5/components/esp_wifi/include/local/esp_wifi_types_native.h
+- Wi-Fi CSI APIs and `WIFI_INIT_CONFIG_DEFAULT()` CSI enable integration:
+  https://github.com/espressif/esp-idf/blob/v5.5.5/components/esp_wifi/include/esp_wifi.h
+- Pinned Wi-Fi Kconfig, including `CONFIG_ESP_WIFI_CSI_ENABLED`:
+  https://github.com/espressif/esp-idf/blob/v5.5.5/components/esp_wifi/Kconfig
+- ESP32-C3 release-v5.5 Wi-Fi vendor feature/CSI guide:
+  https://docs.espressif.com/projects/esp-idf/en/release-v5.5/esp32c3/api-guides/wifi-driver/wifi-vendor-features.html
+- Espressif ESP-CSI get-started reference:
+  https://github.com/espressif/esp-csi/tree/master/examples/get-started
+
+NGN-003 uses the pinned declarations directly rather than copying Espressif example
+source. In the ESP-IDF CSI byte representation a complex sample is stored as signed
+`[imaginary, real]`; the SDK also exposes `first_word_invalid` for the hardware
+first-word limitation. The local 612-byte raw capacity follows the largest CSI byte
+count documented by the pinned format table. These format/API facts are SDK evidence,
+not evidence that a particular physical NGN board/link produces a particular length
+or timing; NGN-0031 owns that hardware check.
