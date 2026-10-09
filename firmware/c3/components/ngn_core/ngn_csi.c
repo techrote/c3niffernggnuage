@@ -64,6 +64,7 @@ bool ngn_csi_source_for_mac(
 }
 
 bool ngn_csi_capture(ngn_node_id_t source,
+                     uint64_t session_id,
                      const uint8_t source_mac[NGN_TRANSPORT_MAC_SIZE],
                      const uint8_t destination_mac[NGN_TRANSPORT_MAC_SIZE],
                      const ngn_csi_rx_meta_t *meta,
@@ -78,7 +79,8 @@ bool ngn_csi_capture(ngn_node_id_t source,
     if (stats == NULL) {
         return false;
     }
-    if (!ngn_node_id_is_valid(source) || !mac_valid(source_mac) ||
+    if (!ngn_node_id_is_valid(source) || session_id == 0u ||
+        !mac_valid(source_mac) ||
         destination_mac == NULL || meta == NULL || data == NULL ||
         enqueue == NULL || length == 0u) {
         ++stats->invalid_input;
@@ -91,6 +93,7 @@ bool ngn_csi_capture(ngn_node_id_t source,
 
     memset(&record, 0, sizeof(record));
     record.source = source;
+    record.session_id = session_id;
     memcpy(record.source_mac, source_mac, sizeof(record.source_mac));
     memcpy(record.destination_mac, destination_mac,
            sizeof(record.destination_mac));
@@ -129,7 +132,7 @@ static bool best_probe(const ngn_csi_raw_t *raw,
         const ngn_csi_probe_observation_t *candidate = &history[i];
         uint64_t delta;
         if (!candidate->valid || candidate->source != raw->source ||
-            candidate->session_id == 0u) {
+            candidate->session_id != raw->session_id) {
             continue;
         }
         delta = time_distance(raw->meta.received_ms, candidate->received_ms);
@@ -193,6 +196,7 @@ ngn_csi_decode_result_t ngn_csi_decode(
 
     memset(&packet, 0, sizeof(packet));
     packet.source = raw->source;
+    packet.session_id = raw->session_id;
     memcpy(packet.source_mac, raw->source_mac, sizeof(packet.source_mac));
     memcpy(packet.destination_mac, raw->destination_mac,
            sizeof(packet.destination_mac));
@@ -214,7 +218,6 @@ ngn_csi_decode_result_t ngn_csi_decode(
     if (best_probe(raw, history, history_count, attribution_window_ms,
                    &observation, &delta)) {
         packet.probe_attributed = true;
-        packet.session_id = observation.session_id;
         packet.epoch = observation.epoch;
         packet.probe_sequence = observation.sequence;
         packet.attribution_delta_ms = delta;
