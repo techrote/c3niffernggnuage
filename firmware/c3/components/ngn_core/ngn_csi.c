@@ -17,7 +17,7 @@ static bool mac_valid(const uint8_t mac[NGN_TRANSPORT_MAC_SIZE])
     return any != 0u;
 }
 
-bool ngn_csi_binding_set(ngn_csi_binding_t bindings[NGN_RADIO_PEER_COUNT],
+bool ngn_csi_binding_set(ngn_csi_binding_t bindings[NGN_CSI_NODE_COUNT],
                          ngn_node_id_t node,
                          const uint8_t mac[NGN_TRANSPORT_MAC_SIZE])
 {
@@ -32,7 +32,7 @@ bool ngn_csi_binding_set(ngn_csi_binding_t bindings[NGN_RADIO_PEER_COUNT],
         memcmp(binding->mac, mac, NGN_TRANSPORT_MAC_SIZE) != 0) {
         return false;
     }
-    for (i = 0u; i < NGN_RADIO_PEER_COUNT; ++i) {
+    for (i = 0u; i < NGN_CSI_NODE_COUNT; ++i) {
         if (i != (size_t)node && bindings[i].bound &&
             memcmp(bindings[i].mac, mac, NGN_TRANSPORT_MAC_SIZE) == 0) {
             return false;
@@ -44,7 +44,7 @@ bool ngn_csi_binding_set(ngn_csi_binding_t bindings[NGN_RADIO_PEER_COUNT],
 }
 
 bool ngn_csi_source_for_mac(
-    const ngn_csi_binding_t bindings[NGN_RADIO_PEER_COUNT],
+    const ngn_csi_binding_t bindings[NGN_CSI_NODE_COUNT],
     const uint8_t mac[NGN_TRANSPORT_MAC_SIZE],
     ngn_node_id_t *out_source)
 {
@@ -53,7 +53,7 @@ bool ngn_csi_source_for_mac(
     if (bindings == NULL || !mac_valid(mac) || out_source == NULL) {
         return false;
     }
-    for (i = 0u; i < NGN_RADIO_PEER_COUNT; ++i) {
+    for (i = 0u; i < NGN_CSI_NODE_COUNT; ++i) {
         if (bindings[i].bound &&
             memcmp(bindings[i].mac, mac, NGN_TRANSPORT_MAC_SIZE) == 0) {
             *out_source = (ngn_node_id_t)i;
