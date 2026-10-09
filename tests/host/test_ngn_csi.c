@@ -99,7 +99,7 @@ static bool test_bounded_capture_and_queue_drop(void)
     const int8_t data[4] = {3, 4, -4, 3};
     int8_t oversize[NGN_CSI_MAX_RAW_BYTES + 1u] = {0};
 
-    CHECK(ngn_csi_capture(NGN_NODE_A, MACS[0], BROADCAST, &meta, data, sizeof(data),
+    CHECK(ngn_csi_capture(NGN_NODE_A, 11u, MACS[0], BROADCAST, &meta, data, sizeof(data),
                           mock_enqueue, &mock, &stats));
     CHECK(mock.called);
     CHECK(stats.captured == 1u);
@@ -116,19 +116,21 @@ static bool test_bounded_capture_and_queue_drop(void)
 
     mock.accept = false;
     mock.called = false;
-    CHECK(!ngn_csi_capture(NGN_NODE_A, MACS[0], BROADCAST, &meta, data, sizeof(data),
+    CHECK(!ngn_csi_capture(NGN_NODE_A, 11u, MACS[0], BROADCAST, &meta, data, sizeof(data),
                            mock_enqueue, &mock, &stats));
     CHECK(mock.called);
     CHECK(stats.queue_drops == 1u);
 
-    CHECK(!ngn_csi_capture(NGN_NODE_A, MACS[0], BROADCAST, &meta, oversize,
+    CHECK(!ngn_csi_capture(NGN_NODE_A, 11u, MACS[0], BROADCAST, &meta, oversize,
                            sizeof(oversize), mock_enqueue, &mock, &stats));
     CHECK(stats.oversize == 1u);
-    CHECK(!ngn_csi_capture(NGN_NODE_UNCONFIGURED, MACS[0], BROADCAST, &meta, data,
+    CHECK(!ngn_csi_capture(NGN_NODE_UNCONFIGURED, 11u, MACS[0], BROADCAST, &meta, data,
                            sizeof(data), mock_enqueue, &mock, &stats));
-    CHECK(!ngn_csi_capture(NGN_NODE_A, MACS[0], BROADCAST, &meta, NULL,
+    CHECK(!ngn_csi_capture(NGN_NODE_A, 11u, MACS[0], BROADCAST, &meta, NULL,
                            sizeof(data), mock_enqueue, &mock, &stats));
-    CHECK(stats.invalid_input == 2u);
+    CHECK(!ngn_csi_capture(NGN_NODE_A, 0u, MACS[0], BROADCAST, &meta, data,
+                           sizeof(data), mock_enqueue, &mock, &stats));
+    CHECK(stats.invalid_input == 3u);
     return true;
 }
 
@@ -139,6 +141,7 @@ static bool test_iq_decode_metadata_and_first_word(void)
     const int8_t data[8] = {99, 99, 99, 99, 3, 4, -4, 3};
 
     raw.source = NGN_NODE_B;
+    raw.session_id = 11u;
     memcpy(raw.source_mac, MACS[1], sizeof(raw.source_mac));
     memcpy(raw.destination_mac, BROADCAST, sizeof(raw.destination_mac));
     raw.meta = metadata(2000u);
@@ -174,6 +177,7 @@ static bool test_probe_attribution_uses_nearest_observation(void)
     const int8_t data[4] = {1, 2, 3, 4};
 
     raw.source = NGN_NODE_A;
+    raw.session_id = 11u;
     memcpy(raw.source_mac, MACS[0], sizeof(raw.source_mac));
     memcpy(raw.destination_mac, BROADCAST, sizeof(raw.destination_mac));
     raw.meta = metadata(1109u);
@@ -181,7 +185,7 @@ static bool test_probe_attribution_uses_nearest_observation(void)
     memcpy(raw.bytes, data, sizeof(data));
 
     history[0] = (ngn_csi_probe_observation_t){
-        .valid = true, .source = NGN_NODE_A, .session_id = 11u,
+        .valid = true, .source = NGN_NODE_A, .session_id = 10u,
         .epoch = 7u, .sequence = 100u, .received_ms = 1100u
     };
     history[1] = (ngn_csi_probe_observation_t){
@@ -198,7 +202,7 @@ static bool test_probe_attribution_uses_nearest_observation(void)
     CHECK(packet.probe_attributed);
     CHECK(packet.session_id == 11u);
     CHECK(packet.epoch == 7u);
-    CHECK(packet.probe_sequence == 101u);
+    CHECK(packet.probe_sequence == 101u); /* session 10 candidate is ignored */
     CHECK(packet.attribution_delta_ms == 1u);
     CHECK((packet.quality_flags & NGN_CSI_QUALITY_UNATTRIBUTED) == 0u);
 
@@ -221,6 +225,7 @@ static bool test_malformed_and_metadata_rejection(void)
     const int8_t data[5] = {1, 2, 3, 4, 5};
 
     raw.source = NGN_NODE_C;
+    raw.session_id = 11u;
     memcpy(raw.source_mac, MACS[2], sizeof(raw.source_mac));
     memcpy(raw.destination_mac, BROADCAST, sizeof(raw.destination_mac));
     raw.meta = metadata(200u);
@@ -255,6 +260,9 @@ static bool test_malformed_and_metadata_rejection(void)
           NGN_CSI_DECODE_INVALID_ARGUMENT);
     CHECK(ngn_csi_decode(&raw, 6u, NULL, NGN_CSI_PROBE_HISTORY + 1u,
                          5u, &packet) == NGN_CSI_DECODE_INVALID_ARGUMENT);
+    raw.session_id = 0u;
+    CHECK(ngn_csi_decode(&raw, 6u, NULL, 0u, 5u, &packet) ==
+          NGN_CSI_DECODE_INVALID_ARGUMENT);
     return true;
 }
 
