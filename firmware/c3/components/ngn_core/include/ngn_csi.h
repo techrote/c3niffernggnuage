@@ -11,6 +11,7 @@
 #define NGN_CSI_MAX_RAW_BYTES 612u
 #define NGN_CSI_MAX_COMPLEX_SAMPLES (NGN_CSI_MAX_RAW_BYTES / 2u)
 #define NGN_CSI_PROBE_HISTORY 16u
+#define NGN_CSI_NODE_COUNT 3u
 
 #define NGN_CSI_QUALITY_FIRST_WORD_SKIPPED (1u << 0)
 #define NGN_CSI_QUALITY_UNATTRIBUTED        (1u << 1)
@@ -100,13 +101,13 @@ typedef struct {
 
 /* Bindings follow the same first-valid-observation model as ngn_radio. A
  * logical node cannot change MAC and one MAC cannot claim two logical nodes. */
-bool ngn_csi_binding_set(ngn_csi_binding_t bindings[NGN_RADIO_PEER_COUNT],
+bool ngn_csi_binding_set(ngn_csi_binding_t bindings[NGN_CSI_NODE_COUNT],
                          ngn_node_id_t node,
                          const uint8_t mac[NGN_TRANSPORT_MAC_SIZE]);
 
 /* Returns false for unknown, zero or multicast source MACs. */
 bool ngn_csi_source_for_mac(
-    const ngn_csi_binding_t bindings[NGN_RADIO_PEER_COUNT],
+    const ngn_csi_binding_t bindings[NGN_CSI_NODE_COUNT],
     const uint8_t mac[NGN_TRANSPORT_MAC_SIZE],
     ngn_node_id_t *out_source);
 
