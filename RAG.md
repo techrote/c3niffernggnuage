@@ -28,13 +28,15 @@ Current implementation state:
 - NGN-004 implements BLE V1 as a NimBLE passive-observer adapter plus ESP-independent session-key/track logic;
 - NGN-007 implements the hardware-independent monochrome framebuffer, FIELD/BLE/LINKS/DEBUG renderer and a configurable/default-disabled ESP32-C3 display-adapter seam;
 - Wi-Fi CSI baseline remains planned as fixed-channel scheduled probe traffic;
-- ESP-NOW in station mode remains the intended C3 transport/probe mechanism;
+- NGN-002 implements protocol v1, coordinator session discovery, MAC bindings and the deterministic A/B/C scheduler over fixed-channel broadcast ESP-NOW in station mode;
+- configured A/B/C roles start that radio path; the unconfigured role remains radio-inactive;
+- the default 390 ms epoch reserves a coexistence opportunity but does not start BLE scanning;
 - CSI V1 remains magnitude/amplitude-first;
 - BLE track events are privacy-safe by default: raw addresses remain transient, session keys change with the injected session nonce, and rotated/private addresses are not rejoined;
 - no CSI, fusion or physical sensing behavior is implemented yet; physical OLED controller/pin confirmation remains deferred to NGN-009;
 - ESP8266 support is optional and outside the critical path.
 
-**NGN-002 recovery status (8 October 2026): [evidence-only checkpoint](https://github.com/techrote/c3niffernggnuage/blob/9ae3c066660a1254343efdf50c6efb5650327af6/checkpoints/prepass/NGN-002/d8185efc499cb91e/CHECKPOINT.md).** The original issue progress report and inspected repository/recovery evidence are preserved, but the reported local implementation candidate and raw candidate-test results were not recovered. Protocol/scheduler implementation and acceptance remain unresolved; the historical 5/5 report is not verified candidate evidence.
+**NGN-002 recovery status (8 October 2026): [evidence-only checkpoint](https://github.com/techrote/c3niffernggnuage/blob/9ae3c066660a1254343efdf50c6efb5650327af6/checkpoints/prepass/NGN-002/d8185efc499cb91e/CHECKPOINT.md).** The original issue progress report and inspected repository/recovery evidence are preserved, but the reported local implementation candidate and raw candidate-test results were not recovered. The historical 5/5 report is not verified candidate evidence. NGN-002 has now been reconstructed from current main and the issue contract, with fresh native tests and a separately reviewable implementation PR linked to #2. The preserved archive remains a historical record, not the source of the new implementation or its acceptance results.
 
 Do not silently upgrade ESP-IDF. A toolchain change needs its own evidence and documentation update.
 

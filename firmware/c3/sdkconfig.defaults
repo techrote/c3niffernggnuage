@@ -2,6 +2,9 @@
 # The target itself is selected explicitly with `idf.py set-target esp32c3`.
 CONFIG_LOG_DEFAULT_LEVEL_INFO=y
 
+# One-millisecond scheduler polling; this is not an airtime-accuracy claim.
+CONFIG_FREERTOS_HZ=1000
+
 # NGN-004 passive BLE observer. Keep this list ESP32-C3-specific; the
 # ESP32-only BTDM_CTRL_MODE_* selectors are not defined for C3 in v5.5.5.
 CONFIG_BT_ENABLED=y

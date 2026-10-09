@@ -25,7 +25,7 @@ Optional later extension:
 
 - 2× ESP8266 D1 mini boards as deterministic Wi-Fi packet sources.
 
-No external router is required by the intended C3-to-C3 sensing mode.
+No external router is required by the implemented NGN-002 C3-to-C3 radio schedule.
 
 ## What the system should show
 
@@ -47,7 +47,7 @@ The system must distinguish **measured observations** from **inferences**. A BLE
 - ESP32-C3 firmware: **ESP-IDF v5.5.5**, pinned for reproducibility.
 - BLE host: **NimBLE**, passive scanning only for the baseline.
 - Wi-Fi sensing: ESP-IDF CSI APIs with fixed-channel scheduled probe traffic.
-- Inter-node/control transport: ESP-NOW in Wi-Fi station mode unless an implementation issue produces measured evidence for a better supported arrangement.
+- Inter-node/control transport: fixed-channel broadcast ESP-NOW in Wi-Fi station mode; protocol v1 uses explicit byte framing, sessions, sequence numbers and CRC-16/CCITT-FALSE.
 - CSI V1: amplitude/magnitude-derived features first; phase-dependent methods are deferred.
 - BLE V1: short-lived observation tracks; no connection attempts and no long-term identity reconstruction.
 - Host tooling: Python for capture, replay, experiment labelling and offline analysis.
@@ -106,4 +106,6 @@ When issue-specific instructions conflict with general documentation, the issue 
 
 ## Status
 
-The NGN-001 foundation is implemented without radio-sensing or display behavior. No physical sensing acceptance is implied; hardware acceptance remains owned by NGN-009.
+NGN-001 provides the foundation. NGN-002 adds the three-node protocol, session discovery, MAC bindings, health records and deterministic radio scheduler. NGN-004 provides the separate passive BLE component, and NGN-007 provides the separate framebuffer/renderer and display adapter.
+
+Configured A/B/C firmware runs the NGN-002 ESP-NOW path; the unconfigured default starts no radio. The nominal 390 ms schedule sends four probes per node and reserves a coexistence opportunity. It does not start CSI acquisition, BLE scanning, fusion or OLED behavior. See [the exact protocol and schedule contract](docs/02-PROTOCOL-AND-DATA.md). No physical sensing result is implied; hardware acceptance remains owned by NGN-009.

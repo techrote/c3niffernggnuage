@@ -1,6 +1,6 @@
 # ESP32-C3 firmware
 
-This directory contains the shared ESP32-C3 firmware foundation.
+This directory contains the shared ESP32-C3 firmware, including the NGN-002 protocol and scheduler.
 
 ## Toolchain
 
@@ -29,7 +29,7 @@ Interactive configuration:
 idf.py menuconfig
 ```
 
-Then choose **C3niffer NGGUNAGE foundation → Logical node role**.
+Then choose **C3niffer NGGUNAGE → Logical node role**.
 
 For reproducible role-specific configuration from a clean generated configuration, use the supplied overlays:
 
@@ -48,12 +48,10 @@ NGN-001 intentionally defines **no OLED, button, battery/BMS, ADC or board-speci
 
 ## Current behavior
 
-The foundation firmware only logs:
+The unconfigured default logs build/node/profile identity and starts no radio. Configured A/B/C roles start fixed-channel broadcast ESP-NOW in Wi-Fi station mode without an access point. C creates a session and advances the epoch; A/B discover C and transmit only in an epoch established by its accepted SYNC.
 
-- firmware identity;
-- protocol identity;
-- ESP-IDF version;
-- selected logical node;
-- board-profile name.
+Protocol v1 carries exact SYNC, PROBE and NODE_HEALTH messages. The experimental default is channel 6 with a 390 ms epoch, four probes per node at 10 ms spacing, an 80 ms coexistence opportunity placeholder and staggered health slots. RX/TX/status queues default to 16 records each. Expired or obsolete-session queued work is dropped. Session, logical-node/station-MAC bindings and radio health are observable in serial diagnostics.
 
-It does not initialize ESP-NOW, Wi-Fi CSI, BLE, fusion or OLED behavior.
+Configure **C3niffer NGGUNAGE → Three-node radio schedule** and keep all nodes on the same channel. See [building/configuration](../../docs/05-BUILDING.md) and [the exact protocol contract](../../docs/02-PROTOCOL-AND-DATA.md) for all bounds and wire offsets.
+
+This path starts no CSI acquisition, BLE scanning, fusion or OLED behavior. The NGN-004/007 components remain separate. No physical radio or sensing acceptance is implied.

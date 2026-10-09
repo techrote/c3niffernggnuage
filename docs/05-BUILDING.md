@@ -24,7 +24,7 @@ Windows users may use Espressif's supported ESP-IDF environment/PowerShell flow 
 
 ## Repository layout
 
-NGN-001 establishes:
+The current project includes:
 
 ```text
 firmware/c3/
@@ -37,7 +37,11 @@ firmware/c3/
   main/
     Kconfig.projbuild
   components/
-    ngn_core/
+    ngn_core/       # node, BLE logic, protocol, schedule, session runtime
+    ngn_radio_esp/  # bounded ESP-NOW transport adapter
+    ngn_ble_esp/    # separate passive BLE adapter
+    ngn_display/   # pure framebuffer/renderer
+    ngn_oled_esp/  # separately configured display adapter
 
 tests/
   host/
@@ -72,19 +76,41 @@ cd firmware/c3
 idf.py menuconfig
 ```
 
-Choose **C3niffer NGGUNAGE foundation → Logical node role**.
+Choose **C3niffer NGGUNAGE → Logical node role**.
 
 For a clean reproducible role overlay:
 
 ```bash
 cd firmware/c3
 rm -f sdkconfig
-idf.py set-target esp32c3
-idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;config/node-a.defaults" reconfigure
+idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;config/node-a.defaults" set-target esp32c3
 idf.py build
 ```
 
 Use `node-b.defaults` or `node-c.defaults` for the other roles.
+
+### Radio configuration
+
+Under **C3niffer NGGUNAGE → Three-node radio schedule**, all durations are milliseconds:
+
+| Kconfig suffix (prefix `CONFIG_NGN_RADIO_`) | Default | Allowed range |
+| --- | ---: | ---: |
+| `CHANNEL` | 6 | 1–11 |
+| `BURST_COUNT` | 4 | 1–16 |
+| `PROBE_SPACING_MS` | 10 | 1–65535 |
+| `SYNC_SLOT_MS` | 40 | 1–65535 |
+| `PROBE_SLOT_MS` | 80 | 1–65535 |
+| `COEXIST_MS` | 80 | 0–65535 |
+| `HEALTH_SLOT_MS` | 10 | 1–65535 |
+| `MISSING_EPOCHS` | 4 | 1–32 |
+| `RX_QUEUE_DEPTH`, `TX_QUEUE_DEPTH`, `STATUS_QUEUE_DEPTH` | 16 each | 1–64 each |
+
+Before radio startup, the complete configuration must satisfy:
+
+- `BURST_COUNT * PROBE_SPACING_MS <= PROBE_SLOT_MS`;
+- `SYNC_SLOT_MS + 3 * PROBE_SLOT_MS + COEXIST_MS + 3 * HEALTH_SLOT_MS <= 60000`.
+
+Invalid combinations fail closed before Wi-Fi starts. All nodes must use the same physical channel. A/B adopt C's valid timing configuration from SYNC on first/new session; timing cannot change inside one session. The default epoch is 390 ms, and the default missing timeout is four epochs (1560 ms). These are configurable experimental defaults. The coexistence interval is a placeholder and starts no BLE scan. See [the exact wire and schedule contract](02-PROTOCOL-AND-DATA.md).
 
 ### Board profile
 
@@ -106,22 +132,15 @@ ctest --test-dir build/host --output-on-failure
 
 GCC/Clang builds use `-Wall -Wextra -Werror -pedantic`.
 
-As protocol, sensing, fusion and rendering logic lands, extend this harness rather than embedding pure algorithms in radio/display adapters.
+Seven suites cover node identity, the unchanged BLE and display contracts, protocol v1, deterministic scheduling, radio health/integration and adversarial session/transport behavior. These compile production core sources; no ESP-IDF headers or physical radio are required. Later sensing and fusion work extends this harness.
 
 ## Configuration ownership
 
 Track `sdkconfig.defaults` and deliberate role/profile overlays. Do not commit machine-specific generated configuration unless an issue explicitly requires a fixture.
 
-Expected feature configuration in later issues includes:
+NGN-002 selects Wi-Fi station mode, fixed channel, RAM configuration and no power saving through the pinned SDK APIs. It does not create an IP interface or associate with an AP. NGN-004's NimBLE observer/coexistence configuration remains intact; compiling those components does not start BLE scanning. CSI enablement and acquisition remain NGN-003 work.
 
-- Wi-Fi station mode;
-- Wi-Fi CSI support;
-- ESP-NOW;
-- NimBLE;
-- Wi-Fi/Bluetooth coexistence controls appropriate to the pinned IDF;
-- serial console/logging.
-
-NGN-002/003/004 own those actual Kconfig settings and must verify names/behavior against v5.5.5 documentation rather than copying settings from another release.
+`CONFIG_FREERTOS_HZ=1000` supplies a nominal one-millisecond scheduler poll. The runtime always delays at least one tick, so a user-selected slower tick remains safe but can skip more expired opportunities. This is a software scheduling default, not a measured airtime-accuracy claim.
 
 For `esp32c3`, do not copy `CONFIG_BTDM_CTRL_MODE_*` selectors from ESP32 or multi-target examples. ESP-IDF v5.5.5 does not define those controller-mode symbols for ESP32-C3; assigning them only produces unknown-symbol warnings. The NGN-004 observer profile is narrowed with the C3-valid NimBLE role, GATT and Security Manager controls plus passive GAP discovery.
 
@@ -146,6 +165,11 @@ NGN-001 deliberately introduces no Python runtime dependency. When Python toolin
    - `esp_idf_version: v5.5.5`
    - `target: esp32c3`
    - `path: firmware/c3`
+3. **ESP32-C3 node C / ESP-IDF v5.5.5** — the same pinned target/action, with
+   `idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;config/node-c.defaults" build`.
+   This explicit coordinator profile links the actual radio startup and random
+   session path into the final image, while the original job retains coverage of
+   the safe unconfigured default.
 
 No attached hardware is required for ordinary PR CI.
 
@@ -160,7 +184,11 @@ cd firmware/c3
 idf.py -p <PORT> flash monitor
 ```
 
-The NGN-001 firmware only logs build/node/profile identity. It does not initialize Wi-Fi CSI, ESP-NOW, BLE, fusion or OLED logic.
+Unconfigured firmware logs its identity and returns before radio startup. Configured A/B/C firmware starts fixed-channel broadcast ESP-NOW; C creates a fresh nonzero 64-bit session after Wi-Fi starts, while A/B wait for C's SYNC. A follower becomes silent after its accepted epoch until a newer SYNC; the longer default 1560 ms silence threshold enters discovery.
+
+The runtime has static storage and a 6144-byte priority-5 worker. The transport worker has a 4096-byte priority-5 stack. A separate priority-1 logger with a 3072-byte stack receives a one-record overwrite snapshot queue; the core event sink only marks diagnostics pending. Logs report session/epoch/state, present mask, counters and logical-node/station-MAC mappings. State values are 0 discovering, 1 synchronized and 2 waiting for SYNC. Stack watermarks and physical timing remain hardware measurements.
+
+The radio adapter has no stop/reconfiguration lifecycle in NGN-002. A fatal task-creation or nonce-generation failure after radio startup requires restart and starts no protocol scheduler. CSI, BLE scans, fusion and OLED behavior remain inactive.
 
 ## Test fixtures
 
