@@ -90,6 +90,44 @@ config NGN_RADIO_STATUS_QUEUE_DEPTH
 
 endmenu
 
+menu "Wi-Fi CSI acquisition"
+
+config NGN_CSI_RAW_QUEUE_DEPTH
+    int "Raw CSI callback queue records"
+    range 1 32
+    default 8
+    help
+        Fixed queue between the ESP-IDF CSI callback and the CSI worker.
+        A full queue drops the newest known-source CSI record and increments
+        an explicit diagnostic counter.
+
+config NGN_CSI_PACKET_QUEUE_DEPTH
+    int "Decoded CSI output queue records"
+    range 1 16
+    default 4
+    help
+        Fixed queue containing normalized CSI packet records for later
+        signal processing or the current diagnostic drain.
+
+config NGN_CSI_ATTRIBUTION_WINDOW_MS
+    int "Accepted-probe correlation window in milliseconds"
+    range 1 50
+    default 5
+    help
+        Match CSI callback capture time to the nearest accepted PROBE from
+        the same logical source inside this window. The selected delta is
+        retained in every attributed record and must be validated on hardware.
+
+config NGN_CSI_DIAGNOSTIC_RAW
+    bool "Emit per-packet raw CSI records to the local console"
+    default n
+    help
+        DEVELOPMENT ONLY. When enabled, a low-priority consumer prints each
+        bounded known-source CSI record including raw I/Q bytes. This can
+        generate heavy serial traffic and is disabled by default.
+
+endmenu
+
 menu "Passive BLE observation"
 
 config NGN_BLE_QUEUE_DEPTH
