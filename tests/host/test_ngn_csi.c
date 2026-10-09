@@ -107,6 +107,7 @@ static bool test_bounded_capture_and_queue_drop(void)
     CHECK(stats.oversize == 0u);
     CHECK(stats.queue_drops == 0u);
     CHECK(mock.record.source == NGN_NODE_A);
+    CHECK(mock.record.session_id == 11u);
     CHECK(mock.record.length == sizeof(data));
     CHECK(mock.record.meta.rssi == -47);
     CHECK(mock.record.meta.rx_sequence == 123u);
@@ -152,6 +153,7 @@ static bool test_iq_decode_metadata_and_first_word(void)
     CHECK(ngn_csi_decode(&raw, 6u, NULL, 0u, 5u, &packet) ==
           NGN_CSI_DECODE_OK);
     CHECK(packet.source == NGN_NODE_B);
+    CHECK(packet.session_id == 11u);
     CHECK(packet.raw_length == 8u);
     CHECK(packet.valid_offset == 4u);
     CHECK(packet.sample_count == 2u);
