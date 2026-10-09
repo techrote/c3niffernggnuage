@@ -58,6 +58,7 @@ typedef struct {
 typedef struct {
     ngn_node_id_t source;
     uint8_t source_mac[NGN_TRANSPORT_MAC_SIZE];
+    uint8_t destination_mac[NGN_TRANSPORT_MAC_SIZE];
     ngn_csi_rx_meta_t meta;
     uint16_t length;
     int8_t bytes[NGN_CSI_MAX_RAW_BYTES];
@@ -83,6 +84,7 @@ typedef enum {
 typedef struct {
     ngn_node_id_t source;
     uint8_t source_mac[NGN_TRANSPORT_MAC_SIZE];
+    uint8_t destination_mac[NGN_TRANSPORT_MAC_SIZE];
     ngn_csi_rx_meta_t meta;
 
     bool probe_attributed;
@@ -115,6 +117,7 @@ bool ngn_csi_source_for_mac(
  * a fixed-size copy and one caller-supplied nonblocking enqueue operation. */
 bool ngn_csi_capture(ngn_node_id_t source,
                      const uint8_t source_mac[NGN_TRANSPORT_MAC_SIZE],
+                     const uint8_t destination_mac[NGN_TRANSPORT_MAC_SIZE],
                      const ngn_csi_rx_meta_t *meta,
                      const int8_t *data,
                      size_t length,
