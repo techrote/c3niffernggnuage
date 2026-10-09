@@ -14,6 +14,14 @@ magnitude = sqrt(I^2 + Q^2)
 
 Squared magnitude may be used internally when it avoids unnecessary square roots, provided normalization and tests reflect the representation.
 
+## NGN-003 acquisition status
+
+NGN-003 now implements the acquisition/normalization boundary before baseline processing. The pinned ESP32-C3 representation is decoded as signed `[imaginary, real]` byte pairs. Raw bytes and receive metadata are retained, ESP-IDF's invalid first word is excluded when flagged, and squared magnitude `I^2 + Q^2` is produced deterministically on the host and firmware.
+
+Only CSI from station MACs already bound to logical A/B/C by the accepted NGN protocol runtime enters the raw queue. Records are correlated with the nearest accepted probe from the same source inside a configurable time window; a known-source record without a match remains explicitly unattributed diagnostic evidence.
+
+The acquisition layer deliberately performs **no gain normalization, baseline update, perturbation score or activity inference**. Those start in NGN-005. See `docs/09-CSI-ACQUISITION.md`.
+
 ## CSI conditioning
 
 The pipeline should be explicit and inspectable:

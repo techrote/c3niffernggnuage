@@ -17,6 +17,7 @@ add_library(ngn_core_host STATIC
     "${NGN_CORE_DIR}/ngn_protocol.c"
     "${NGN_CORE_DIR}/ngn_schedule.c"
     "${NGN_CORE_DIR}/ngn_radio.c"
+    "${NGN_CORE_DIR}/ngn_csi.c"
 )
 
 target_include_directories(ngn_core_host PUBLIC
@@ -47,7 +48,7 @@ endif()
 add_test(NAME ngn_node COMMAND test_ngn_node)
 add_test(NAME ngn_ble COMMAND test_ngn_ble)
 
-foreach(NGN_SUITE protocol schedule radio radio_adversarial)
+foreach(NGN_SUITE protocol schedule radio radio_adversarial csi)
     add_executable(test_ngn_${NGN_SUITE} test_ngn_${NGN_SUITE}.c)
     target_link_libraries(test_ngn_${NGN_SUITE} PRIVATE ngn_core_host)
     if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")

@@ -36,6 +36,8 @@ typedef struct {
     uint32_t present_events[3];
     uint32_t missing_events[3];
     uint32_t coexist_events;
+    uint32_t probe_rx_events;
+    ngn_radio_event_t last_probe_rx;
 } node_t;
 
 typedef struct {
@@ -117,6 +119,9 @@ static void observe_event(void *context, const ngn_radio_event_t *event)
     if (event->kind == NGN_RADIO_EVENT_SCHEDULE &&
         event->schedule.kind == NGN_SCHEDULE_COEXIST_OPPORTUNITY) {
         ++node->coexist_events;
+    } else if (event->kind == NGN_RADIO_EVENT_PROBE_RX) {
+        ++node->probe_rx_events;
+        node->last_probe_rx = *event;
     } else if (ngn_node_id_is_valid(event->node)) {
         if (event->kind == NGN_RADIO_EVENT_PRESENT) {
             ++node->present_events[(size_t)event->node];
@@ -392,6 +397,12 @@ static bool test_coordinator_schedule_adoption(void)
         CHECK(bus.nodes[id].stats.tx_queue_drops == 0u);
         CHECK(bus.nodes[id].stats.rx_queue_drops == 0u);
         CHECK(bus.nodes[id].stats.status_queue_drops == 0u);
+        CHECK(bus.nodes[id].probe_rx_events == 16u);
+        CHECK(bus.nodes[id].last_probe_rx.session_id == TEST_SESSION);
+        CHECK(bus.nodes[id].last_probe_rx.epoch == 3u);
+        CHECK(ngn_node_id_is_valid(bus.nodes[id].last_probe_rx.node));
+        CHECK(bus.nodes[id].last_probe_rx.node != (ngn_node_id_t)id);
+        CHECK(bus.nodes[id].last_probe_rx.observed_ms >= 1000u);
     }
     CHECK(bus.sent[NGN_NODE_C][NGN_MESSAGE_SYNC] == 4u);
     CHECK(bus.sent[NGN_NODE_A][NGN_MESSAGE_SYNC] == 0u);

@@ -26,7 +26,8 @@ typedef enum {
     NGN_RADIO_EVENT_BOUND,
     NGN_RADIO_EVENT_PRESENT,
     NGN_RADIO_EVENT_MISSING,
-    NGN_RADIO_EVENT_SYNC_TIMEOUT
+    NGN_RADIO_EVENT_SYNC_TIMEOUT,
+    NGN_RADIO_EVENT_PROBE_RX
 } ngn_radio_event_kind_t;
 
 typedef struct {
@@ -35,10 +36,13 @@ typedef struct {
     uint32_t epoch;
     ngn_node_id_t node;
     ngn_schedule_event_t schedule;
+    uint32_t sequence;
+    uint64_t observed_ms;
 } ngn_radio_event_t;
 
 /* Called only from init/service, never a radio callback. Must not block or
- * re-enter the radio. Schedule notifications do not start sensing work. */
+ * re-enter the radio. Schedule notifications do not start sensing work.
+ * PROBE_RX reports an already accepted probe and its callback capture time. */
 typedef void (*ngn_radio_event_sink_t)(void *context,
                                        const ngn_radio_event_t *event);
 

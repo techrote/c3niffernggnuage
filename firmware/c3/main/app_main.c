@@ -1,6 +1,7 @@
 #include "sdkconfig.h"
 
 #include <inttypes.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "esp_log.h"
@@ -11,6 +12,7 @@
 #include "freertos/queue.h"
 #include "freertos/task.h"
 
+#include "ngn_csi_esp.h"
 #include "ngn_radio.h"
 #include "ngn_radio_esp.h"
 
@@ -32,6 +34,7 @@ typedef struct {
     uint8_t mac[NGN_RADIO_PEER_COUNT][NGN_TRANSPORT_MAC_SIZE];
     ngn_radio_stats_t core;
     ngn_transport_stats_t adapter;
+    ngn_csi_esp_stats_t csi;
 } radio_diagnostic_t;
 
 static ngn_node_id_t configured_node_id(void)
@@ -55,8 +58,26 @@ static uint64_t monotonic_ms(void)
 static void radio_event(void *context, const ngn_radio_event_t *event)
 {
     (void)context;
+
+    if (ngn_csi_esp_active()) {
+        if (event->kind == NGN_RADIO_EVENT_SESSION) {
+            (void)ngn_csi_esp_set_session(event->session_id);
+        } else if (event->kind == NGN_RADIO_EVENT_BOUND &&
+                   ngn_node_id_is_valid(event->node)) {
+            const ngn_radio_peer_t *peer = ngn_radio_peer(&radio, event->node);
+            if (peer != NULL && peer->bound) {
+                (void)ngn_csi_esp_bind(event->node, peer->mac);
+            }
+        } else if (event->kind == NGN_RADIO_EVENT_PROBE_RX) {
+            (void)ngn_csi_esp_note_probe(event->node, event->session_id,
+                                         event->epoch, event->sequence,
+                                         event->observed_ms);
+        }
+    }
+
     if (event->kind != NGN_RADIO_EVENT_EPOCH &&
-        event->kind != NGN_RADIO_EVENT_SCHEDULE) {
+        event->kind != NGN_RADIO_EVENT_SCHEDULE &&
+        event->kind != NGN_RADIO_EVENT_PROBE_RX) {
         diagnostic_due = true;
     }
 }
@@ -71,6 +92,7 @@ static void publish_diagnostic(void)
     snapshot.present_mask = ngn_radio_present_mask(&radio);
     snapshot.core = radio.stats;
     transport.get_stats(transport.context, &snapshot.adapter);
+    ngn_csi_esp_get_stats(&snapshot.csi);
     for (i = 0u; i < NGN_RADIO_PEER_COUNT; ++i) {
         if (radio.peers[i].bound) {
             snapshot.bound_mask |= (uint8_t)(1u << i);
@@ -95,12 +117,19 @@ static void diagnostic_worker(void *argument)
         ESP_LOGI(TAG,
                  "session=%016" PRIx64 " epoch=%" PRIu32
                  " state=%u present=0x%02x rx=%" PRIu32 " rejected=%" PRIu32
-                 " queued=%" PRIu32 " completed=%" PRIu32 " late=%" PRIu32,
+                 " queued=%" PRIu32 " completed=%" PRIu32 " late=%" PRIu32
+                 " csi_cb=%" PRIu32 " csi_emit=%" PRIu32
+                 " csi_unknown=%" PRIu32 " csi_unattrib=%" PRIu32
+                 " csi_raw_drop=%" PRIu32 " csi_out_drop=%" PRIu32,
                  snapshot.session, snapshot.epoch, (unsigned)snapshot.state,
                  (unsigned)snapshot.present_mask, snapshot.core.rx_accepted,
                  snapshot.core.rx_rejected, snapshot.core.tx_queued,
                  snapshot.adapter.tx_completed,
-                 snapshot.core.tx_late_drops + snapshot.adapter.tx_expired);
+                 snapshot.core.tx_late_drops + snapshot.adapter.tx_expired,
+                 snapshot.csi.capture.captured, snapshot.csi.emitted,
+                 snapshot.csi.callback_unknown_source, snapshot.csi.unattributed,
+                 snapshot.csi.capture.queue_drops,
+                 snapshot.csi.packet_queue_drops);
         for (i = 0u; i < NGN_RADIO_PEER_COUNT; ++i) {
             const uint8_t *mac = snapshot.mac[i];
             if ((snapshot.bound_mask & (1u << i)) != 0u &&
@@ -113,6 +142,42 @@ static void diagnostic_worker(void *argument)
             }
         }
         previous = snapshot;
+    }
+}
+
+static void csi_output_worker(void *argument)
+{
+    ngn_csi_packet_t packet;
+    (void)argument;
+
+    for (;;) {
+        if (!ngn_csi_esp_receive(&packet)) {
+            vTaskDelay(1u);
+            continue;
+        }
+#if CONFIG_NGN_CSI_DIAGNOSTIC_RAW
+        {
+            size_t i;
+            printf("NGN_CSI_RAW v=1 src=%s attrib=%u session=%016" PRIx64
+                   " epoch=%" PRIu32 " probe=%" PRIu32 " delta_ms=%u"
+                   " rssi=%d noise=%d channel=%u sig_mode=%u mcs=%u cwb=%u"
+                   " first_invalid=%u raw_len=%u valid_offset=%u iq=",
+                   ngn_node_id_name(packet.source),
+                   packet.probe_attributed ? 1u : 0u,
+                   packet.session_id, packet.epoch, packet.probe_sequence,
+                   (unsigned)packet.attribution_delta_ms,
+                   (int)packet.meta.rssi, (int)packet.meta.noise_floor,
+                   (unsigned)packet.meta.channel,
+                   (unsigned)packet.meta.sig_mode, (unsigned)packet.meta.mcs,
+                   (unsigned)packet.meta.cwb,
+                   packet.meta.first_word_invalid ? 1u : 0u,
+                   (unsigned)packet.raw_length, (unsigned)packet.valid_offset);
+            for (i = 0u; i < packet.raw_length; ++i) {
+                printf("%s%d", i == 0u ? "" : ",", (int)packet.raw_iq[i]);
+            }
+            printf("\n");
+        }
+#endif
     }
 }
 
@@ -150,6 +215,12 @@ void app_main(void)
         .tx_queue_depth = CONFIG_NGN_RADIO_TX_QUEUE_DEPTH,
         .status_queue_depth = CONFIG_NGN_RADIO_STATUS_QUEUE_DEPTH
     };
+    const ngn_csi_esp_config_t csi_config = {
+        .channel = CONFIG_NGN_RADIO_CHANNEL,
+        .raw_queue_depth = CONFIG_NGN_CSI_RAW_QUEUE_DEPTH,
+        .packet_queue_depth = CONFIG_NGN_CSI_PACKET_QUEUE_DEPTH,
+        .attribution_window_ms = CONFIG_NGN_CSI_ATTRIBUTION_WINDOW_MS
+    };
     esp_err_t result;
 
     ESP_LOGI(TAG, "firmware=%s protocol=%u esp-idf=%s node=%s board=%s",
@@ -186,6 +257,14 @@ void app_main(void)
         diagnostic_queue = NULL;
         return;
     }
+    result = ngn_csi_esp_start(&csi_config);
+    if (result != ESP_OK) {
+        ESP_LOGE(TAG, "CSI startup failed after radio start: %s; restart required",
+                 esp_err_to_name(result));
+        vQueueDelete(diagnostic_queue);
+        diagnostic_queue = NULL;
+        return;
+    }
     if (node_id == NGN_NODE_C) {
         unsigned attempt;
         /* Wi-Fi is active before obtaining the coordinator's fresh nonce. */
@@ -198,6 +277,13 @@ void app_main(void)
             diagnostic_queue = NULL;
             return;
         }
+    }
+    if (xTaskCreate(csi_output_worker, "ngn_csi_out", 4096u, NULL, 1u, NULL) !=
+        pdPASS) {
+        ESP_LOGE(TAG, "cannot create CSI output task; restart required");
+        vQueueDelete(diagnostic_queue);
+        diagnostic_queue = NULL;
+        return;
     }
     if (xTaskCreate(diagnostic_worker, "ngn_radio_log", 3072u, NULL, 1u, NULL) !=
         pdPASS) {

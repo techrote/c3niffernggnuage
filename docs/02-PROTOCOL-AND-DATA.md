@@ -1,8 +1,8 @@
 # 02 — Protocol and data contracts
 
-NGN-002 implements protocol-v1 `SYNC`, `PROBE` and `NODE_HEALTH`, the deterministic epoch plan and its host-testable session runtime. The codecs and scheduler live in `firmware/c3/components/ngn_core`; the ESP32-C3 transport adapter lives in `firmware/c3/components/ngn_radio_esp`.
+NGN-002 implements protocol-v1 `SYNC`, `PROBE` and `NODE_HEALTH`, the deterministic epoch plan and its host-testable session runtime. NGN-003 adds a **local** CSI acquisition/normalization record without changing protocol-v1 bytes or assigning a new wire message type. The codecs, scheduler and host-testable CSI core live in `firmware/c3/components/ngn_core`; ESP32-C3 adapters live in `ngn_radio_esp` and `ngn_csi_esp`.
 
-These are control, probe and diagnostic contracts. They do not implement CSI capture/reduction, BLE scanning, inter-node BLE summaries, fusion or OLED behavior. The later data contracts at the end of this document remain separate from the implemented wire types.
+The on-wire types remain control, probe and diagnostic contracts. NGN-003's CSI packet is an in-memory production interface for later signal processing/capture; BLE summaries, CSI summaries, fusion and OLED behavior remain separate later contracts.
 
 ## Protocol-v1 envelope
 
@@ -194,21 +194,44 @@ Adapter statistics also expose invalid RX metadata, unexpected callbacks, expire
 
 `CSI_SUMMARY`, `BLE_OBS`/track updates and optional `CONTROL` remain unimplemented inter-node message families. They have no assigned type value or wire layout here. Their owning issues must introduce explicit versioned encodings and tests when integrating those components; native structs are not an extension mechanism.
 
-### CSI sample record
+### CSI packet record — implemented locally by NGN-003
 
-NGN-003/008 own capture and logging of this later record. NGN-002 provides attributable probes but does not register a CSI callback. A raw/debug CSI record should be able to represent:
+NGN-003 does **not** add a protocol-v1 message type. It implements
+`ngn_csi_packet_t` as a bounded local record consumed by later NGN-005/008
+work.
 
-- local monotonic timestamp;
-- session/epoch;
-- receiver node;
-- transmitter/source identity;
-- probe sequence;
-- RSSI;
-- noise floor when available;
-- channel/bandwidth/rate metadata needed to interpret CSI;
-- CSI byte length;
-- raw I/Q data or a reference to it;
-- capture quality flags.
+The record retains:
+
+- receiver-local callback monotonic milliseconds;
+- logical transmitter node plus accepted source station MAC;
+- destination MAC;
+- RSSI and noise floor;
+- PHY rate, signal mode, MCS, channel bandwidth, smoothing/sounding,
+  aggregation, STBC, FEC and SGI metadata;
+- AMPDU count, primary/secondary channel, antenna, RX state, received signal
+  length, hardware timestamp and Wi-Fi RX sequence;
+- raw CSI byte length and complete signed raw I/Q bytes;
+- valid-data offset (four when ESP-IDF marks the first word invalid);
+- squared-magnitude vector and complex-sample count;
+- capture-time nonzero session ID plus optional epoch and accepted PROBE source sequence;
+- absolute callback-time delta to the selected accepted PROBE;
+- quality flags for first-word exclusion and unattributed known-source CSI.
+
+The pinned byte convention is signed `[imaginary, real]`. Squared magnitude is
+`imaginary^2 + real^2`. The raw capacity is 612 bytes.
+
+Source admission is inherited from the runtime's current logical-node/station
+MAC mapping. Unknown source MACs are filtered before the CSI payload is copied.
+An accepted protocol PROBE produces a separate normal-worker `PROBE_RX` event;
+the CSI worker correlates by same logical source and nearest capture timestamp
+inside the configured bounded window.
+
+The capture-time session is retained even for delayed/unattributed records, and only probe observations from that same session are eligible for correlation. Known-source CSI without a matching accepted probe is explicitly marked
+unattributed and is diagnostic evidence only. It must not be interpreted as a
+session/epoch/probe measurement by NGN-005. The 5 ms default correlation window
+is configurable and is not a measured hardware guarantee.
+
+See `docs/09-CSI-ACQUISITION.md` for queue, callback and SDK details.
 
 ### CSI summary record
 

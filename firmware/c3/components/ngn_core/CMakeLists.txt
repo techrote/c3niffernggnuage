@@ -5,5 +5,6 @@ idf_component_register(
         "ngn_protocol.c"
         "ngn_schedule.c"
         "ngn_radio.c"
+        "ngn_csi.c"
     INCLUDE_DIRS "include"
 )

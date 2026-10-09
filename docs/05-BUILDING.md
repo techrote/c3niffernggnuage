@@ -37,8 +37,9 @@ firmware/c3/
   main/
     Kconfig.projbuild
   components/
-    ngn_core/       # node, BLE logic, protocol, schedule, session runtime
+    ngn_core/       # node, BLE, protocol/schedule/session and host-testable CSI core
     ngn_radio_esp/  # bounded ESP-NOW transport adapter
+    ngn_csi_esp/    # bounded pinned-SDK CSI callback/worker adapter
     ngn_ble_esp/    # separate passive BLE adapter
     ngn_display/   # pure framebuffer/renderer
     ngn_oled_esp/  # separately configured display adapter
@@ -112,6 +113,32 @@ Before radio startup, the complete configuration must satisfy:
 
 Invalid combinations fail closed before Wi-Fi starts. All nodes must use the same physical channel. A/B adopt C's valid timing configuration from SYNC on first/new session; timing cannot change inside one session. The default epoch is 390 ms, and the default missing timeout is four epochs (1560 ms). These are configurable experimental defaults. The coexistence interval is a placeholder and starts no BLE scan. See [the exact wire and schedule contract](02-PROTOCOL-AND-DATA.md).
 
+### CSI acquisition configuration
+
+NGN-003 enables the pinned Wi-Fi driver CSI feature in tracked defaults:
+
+```text
+CONFIG_ESP_WIFI_CSI_ENABLED=y
+```
+
+Project settings under **C3niffer NGGUNAGE → Wi-Fi CSI acquisition** are:
+
+| Kconfig suffix (prefix `CONFIG_NGN_CSI_`) | Default | Allowed range |
+| --- | ---: | ---: |
+| `RAW_QUEUE_DEPTH` | 8 | 1–32 |
+| `PACKET_QUEUE_DEPTH` | 4 | 1–16 |
+| `ATTRIBUTION_WINDOW_MS` | 5 ms | 1–50 ms |
+| `DIAGNOSTIC_RAW` | off | boolean |
+
+The CSI adapter starts only after NGN-002 has initialized Wi-Fi station mode on
+the fixed channel. It enables promiscuous receive and CSI on that existing
+interface; it does not associate with an AP or create an IP interface.
+`DIAGNOSTIC_RAW` is a development-only local serial stream and can be
+high-volume. It is not the NGN-008 capture format.
+
+See `docs/09-CSI-ACQUISITION.md` for the exact callback/worker and record
+contracts.
+
 ### Board profile
 
 `CONFIG_NGN_BOARD_PROFILE` defaults to `generic-esp32c3`.
@@ -132,13 +159,13 @@ ctest --test-dir build/host --output-on-failure
 
 GCC/Clang builds use `-Wall -Wextra -Werror -pedantic`.
 
-Seven suites cover node identity, the unchanged BLE and display contracts, protocol v1, deterministic scheduling, radio health/integration and adversarial session/transport behavior. These compile production core sources; no ESP-IDF headers or physical radio are required. Later sensing and fusion work extends this harness.
+Eight suites cover node identity, the unchanged BLE and display contracts, protocol v1, deterministic scheduling, radio health/integration, adversarial session/transport behavior and NGN-003 CSI acquisition/attribution. These compile production core sources; no ESP-IDF headers or physical radio are required. Later sensing and fusion work extends this harness.
 
 ## Configuration ownership
 
 Track `sdkconfig.defaults` and deliberate role/profile overlays. Do not commit machine-specific generated configuration unless an issue explicitly requires a fixture.
 
-NGN-002 selects Wi-Fi station mode, fixed channel, RAM configuration and no power saving through the pinned SDK APIs. It does not create an IP interface or associate with an AP. NGN-004's NimBLE observer/coexistence configuration remains intact; compiling those components does not start BLE scanning. CSI enablement and acquisition remain NGN-003 work.
+NGN-002 selects Wi-Fi station mode, fixed channel, RAM configuration and no power saving through the pinned SDK APIs. It does not create an IP interface or associate with an AP. NGN-003 enables the pinned Wi-Fi CSI feature and, after radio startup, enables promiscuous receive plus bounded CSI capture on that same interface. NGN-004's NimBLE observer/coexistence configuration remains intact; compiling those components does not start BLE scanning.
 
 `CONFIG_FREERTOS_HZ=1000` supplies a nominal one-millisecond scheduler poll. The runtime always delays at least one tick, so a user-selected slower tick remains safe but can skip more expired opportunities. This is a software scheduling default, not a measured airtime-accuracy claim.
 
@@ -167,9 +194,9 @@ NGN-001 deliberately introduces no Python runtime dependency. When Python toolin
    - `path: firmware/c3`
 3. **ESP32-C3 node C / ESP-IDF v5.5.5** — the same pinned target/action, with
    `idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;config/node-c.defaults" build`.
-   This explicit coordinator profile links the actual radio startup and random
-   session path into the final image, while the original job retains coverage of
-   the safe unconfigured default.
+   This explicit coordinator profile links the actual radio startup, random
+   session and NGN-003 CSI startup path into the final image, while the original
+   job retains coverage of the safe unconfigured default.
 
 No attached hardware is required for ordinary PR CI.
 
@@ -184,11 +211,11 @@ cd firmware/c3
 idf.py -p <PORT> flash monitor
 ```
 
-Unconfigured firmware logs its identity and returns before radio startup. Configured A/B/C firmware starts fixed-channel broadcast ESP-NOW; C creates a fresh nonzero 64-bit session after Wi-Fi starts, while A/B wait for C's SYNC. A follower becomes silent after its accepted epoch until a newer SYNC; the longer default 1560 ms silence threshold enters discovery.
+Unconfigured firmware logs its identity and returns before radio startup. Configured A/B/C firmware starts fixed-channel broadcast ESP-NOW and the NGN-003 CSI adapter; C creates a fresh nonzero 64-bit session after Wi-Fi starts, while A/B wait for C's SYNC. A follower becomes silent after its accepted epoch until a newer SYNC; the longer default 1560 ms silence threshold enters discovery.
 
-The runtime has static storage and a 6144-byte priority-5 worker. The transport worker has a 4096-byte priority-5 stack. A separate priority-1 logger with a 3072-byte stack receives a one-record overwrite snapshot queue; the core event sink only marks diagnostics pending. Logs report session/epoch/state, present mask, counters and logical-node/station-MAC mappings. State values are 0 discovering, 1 synchronized and 2 waiting for SYNC. Stack watermarks and physical timing remain hardware measurements.
+The runtime has static storage and a 6144-byte priority-5 worker. The transport worker has a 4096-byte priority-5 stack. NGN-003 adds a 6144-byte priority-2 CSI decode worker plus bounded raw/output queues and a 4096-byte priority-1 decoded-output drain. A separate priority-1 logger with a 3072-byte stack receives a one-record overwrite snapshot queue; the core event sink only marks diagnostics pending. Logs report session/epoch/state, present mask, counters and logical-node/station-MAC mappings. State values are 0 discovering, 1 synchronized and 2 waiting for SYNC. Stack watermarks and physical timing remain hardware measurements.
 
-The radio adapter has no stop/reconfiguration lifecycle in NGN-002. A fatal task-creation or nonce-generation failure after radio startup requires restart and starts no protocol scheduler. CSI, BLE scans, fusion and OLED behavior remain inactive.
+The radio/CSI adapters have no normal stop/reconfiguration lifecycle yet. A fatal task-creation, CSI-startup or nonce-generation failure after radio startup requires restart. BLE scans, baseline/perturbation processing, fusion and OLED behavior remain inactive.
 
 ## Test fixtures
 

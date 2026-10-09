@@ -31,6 +31,21 @@ static void emit(ngn_radio_t *radio, ngn_radio_event_kind_t kind,
     }
 }
 
+static void emit_probe_rx(ngn_radio_t *radio, const ngn_message_t *message,
+                          uint64_t received_ms)
+{
+    if (radio->event_sink != NULL) {
+        ngn_radio_event_t event = {0};
+        event.kind = NGN_RADIO_EVENT_PROBE_RX;
+        event.session_id = message->header.session_id;
+        event.epoch = message->header.epoch;
+        event.node = message->header.source;
+        event.sequence = message->header.sequence;
+        event.observed_ms = received_ms;
+        radio->event_sink(radio->event_context, &event);
+    }
+}
+
 uint8_t ngn_radio_present_mask(const ngn_radio_t *radio)
 {
     uint8_t mask = 0u;
@@ -349,7 +364,9 @@ static void accept_rx(ngn_radio_t *radio, const ngn_transport_rx_t *frame,
     if (!was_present) {
         emit(radio, NGN_RADIO_EVENT_PRESENT, message.header.source, NULL);
     }
-    if (message.header.type == NGN_MESSAGE_SYNC) {
+    if (message.header.type == NGN_MESSAGE_PROBE) {
+        emit_probe_rx(radio, &message, frame->received_ms);
+    } else if (message.header.type == NGN_MESSAGE_SYNC) {
         emit(radio, NGN_RADIO_EVENT_EPOCH, NGN_NODE_C, NULL);
     }
 }

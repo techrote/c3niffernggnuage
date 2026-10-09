@@ -27,13 +27,13 @@ Current implementation state:
 - GitHub Actions run native CTest and a pinned ESP32-C3 firmware build;
 - NGN-004 implements BLE V1 as a NimBLE passive-observer adapter plus ESP-independent session-key/track logic;
 - NGN-007 implements the hardware-independent monochrome framebuffer, FIELD/BLE/LINKS/DEBUG renderer and a configurable/default-disabled ESP32-C3 display-adapter seam;
-- Wi-Fi CSI baseline remains planned as fixed-channel scheduled probe traffic;
+- NGN-003 implements fixed-channel ESP32-C3 CSI acquisition, known-source admission, bounded callback capture, host-tested I/Q decoding and accepted-probe attribution;
 - NGN-002 implements protocol v1, coordinator session discovery, MAC bindings and the deterministic A/B/C scheduler over fixed-channel broadcast ESP-NOW in station mode;
 - configured A/B/C roles start that radio path; the unconfigured role remains radio-inactive;
 - the default 390 ms epoch reserves a coexistence opportunity but does not start BLE scanning;
 - CSI V1 remains magnitude/amplitude-first;
 - BLE track events are privacy-safe by default: raw addresses remain transient, session keys change with the injected session nonce, and rotated/private addresses are not rejoined;
-- no CSI, fusion or physical sensing behavior is implemented yet; physical OLED controller/pin confirmation remains deferred to NGN-009;
+- CSI baseline/calibration, fusion and physical sensing acceptance remain unimplemented; physical CSI acquisition sanity is separated into NGN-0031 and full sensing/OLED acceptance remains NGN-009;
 - ESP8266 support is optional and outside the critical path.
 
 **NGN-002 recovery status (8 October 2026): [evidence-only checkpoint](https://github.com/techrote/c3niffernggnuage/blob/9ae3c066660a1254343efdf50c6efb5650327af6/checkpoints/prepass/NGN-002/d8185efc499cb91e/CHECKPOINT.md).** The original issue progress report and inspected repository/recovery evidence are preserved, but the reported local implementation candidate and raw candidate-test results were not recovered. The historical 5/5 report is not verified candidate evidence. NGN-002 has now been reconstructed from current main and the issue contract, with fresh native tests and a separately reviewable implementation PR linked to #2. The preserved archive remains a historical record, not the source of the new implementation or its acceptance results.
@@ -115,7 +115,7 @@ See `docs/06-PRIVACY-AND-SCOPE.md`.
 
 - **[NGN-001 / #1](https://github.com/techrote/c3niffernggnuage/issues/1)** — repository/firmware foundation and CI. No dependencies.
 - **[NGN-002 / #2](https://github.com/techrote/c3niffernggnuage/issues/2)** — node protocol, discovery and radio scheduler. Depends on NGN-001.
-- **[NGN-003 / #3](https://github.com/techrote/c3niffernggnuage/issues/3)** — CSI acquisition and source attribution. Depends on NGN-002.
+- **[NGN-003 / #3](https://github.com/techrote/c3niffernggnuage/issues/3)** — bounded CSI acquisition, I/Q decoding and accepted-probe source attribution. Depends on NGN-002. Its software contract is documented in `docs/09-CSI-ACQUISITION.md`.
 - **[NGN-004 / #4](https://github.com/techrote/c3niffernggnuage/issues/4)** — passive BLE observation pipeline. Depends on NGN-001; designed to proceed in parallel with NGN-002/003 while preserving boundaries.
 - **[NGN-005 / #5](https://github.com/techrote/c3niffernggnuage/issues/5)** — baseline/perturbation signal engine. Depends on NGN-003.
 - **[NGN-006 / #6](https://github.com/techrote/c3niffernggnuage/issues/6)** — coordinator fusion and event model. Depends on NGN-002, NGN-004 and NGN-005.
@@ -158,4 +158,5 @@ After NGN-001:
 - BLE/privacy boundaries: `docs/06-PRIVACY-AND-SCOPE.md`
 - implemented passive BLE component: `docs/07-BLE-OBSERVATION.md`
 - hardware-independent OLED presentation: `docs/08-DISPLAY.md`
+- implemented CSI acquisition: `docs/09-CSI-ACQUISITION.md`
 - upstream references: `docs/REFERENCES.md`
